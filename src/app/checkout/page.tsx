@@ -1,17 +1,25 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useCart } from '@/lib/cart-store';
 import { useTenant } from '@/lib/tenant-context';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { CreditCard, Banknote, Building2, CheckCircle } from 'lucide-react';
 
 type PaymentMethod = 'COD' | 'BANK' | 'CREDIT';
 
 export default function CheckoutPage() {
-    const { items, getTotal, clearCart } = useCart();
+    const { getItems, getTotal, clearCart } = useCart();
     const { tenant } = useTenant();
     const router = useRouter();
+    const params = useParams();
+
+    // Get store slug from URL params or tenant subdomain
+    const storeSlug = (params?.storeSlug as string) || tenant?.subdomain || 'demo';
+
+    // Get items for this store
+    const items = useMemo(() => getItems(storeSlug), [getItems, storeSlug]);
+    const total = useMemo(() => getTotal(storeSlug), [getTotal, storeSlug]);
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [orderPlaced, setOrderPlaced] = useState(false);
@@ -52,12 +60,12 @@ export default function CheckoutPage() {
         console.log('Order submitted:', {
             customer: formData,
             items,
-            total: getTotal(),
+            total: total,
             paymentMethod,
         });
 
         setOrderPlaced(true);
-        clearCart();
+        clearCart(storeSlug);
         setIsSubmitting(false);
     };
 
@@ -266,7 +274,7 @@ export default function CheckoutPage() {
                                 <div className="space-y-2 border-b pb-4 mb-4">
                                     <div className="flex justify-between text-sm">
                                         <span className="text-gray-600">Subtotal</span>
-                                        <span>{formatPrice(getTotal())}</span>
+                                        <span>{formatPrice(total)}</span>
                                     </div>
                                     <div className="flex justify-between text-sm">
                                         <span className="text-gray-600">Shipping</span>
@@ -276,7 +284,7 @@ export default function CheckoutPage() {
 
                                 <div className="flex justify-between text-lg font-bold mb-6">
                                     <span>Total</span>
-                                    <span style={{ color: tenant?.primaryColor || '#C8102E' }}>{formatPrice(getTotal())}</span>
+                                    <span style={{ color: tenant?.primaryColor || '#C8102E' }}>{formatPrice(total)}</span>
                                 </div>
 
                                 <button
