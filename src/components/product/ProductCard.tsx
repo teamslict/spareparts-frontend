@@ -32,17 +32,21 @@ export function ProductCard({
     category,
     stockStatus,
     rating,
-    slug
-}: ProductCardProps) {
+    slug,
+    matchedAlias // New prop
+}: ProductCardProps & { matchedAlias?: string | null }) {
     const { addItem } = useCart();
     const { tenant } = useTenant();
+
+    // Use current tenant's slug for cart namespace and links
+    const storeSlug = tenant?.subdomain || 'demo';
 
     const handleAddToCart = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
 
         if (price !== null) {
-            addItem({
+            addItem(storeSlug, {
                 productId: id,
                 name,
                 sku,
@@ -69,7 +73,7 @@ export function ProductCard({
     const badge = stockBadge[stockStatus];
 
     return (
-        <Link href={`/products/${slug}`} className="block group">
+        <Link href={`/${storeSlug}/products/${slug}`} className="block group">
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 group-hover:shadow-lg group-hover:-translate-y-1">
                 {/* Image Container */}
                 <div className="relative aspect-square p-6 bg-gray-50/50 group-hover:bg-gray-50 transition-colors">
@@ -119,6 +123,14 @@ export function ProductCard({
                     <h3 className="font-semibold text-gray-800 text-sm md:text-base leading-snug mb-2 group-hover:text-red-600 transition-colors line-clamp-2 min-h-[44px]">
                         {name}
                     </h3>
+
+                    {/* Display matched alias if present */}
+                    {matchedAlias && (
+                        <p className="text-xs font-semibold text-amber-600 mt-1 flex items-center gap-1">
+                            <span className="opacity-75">Replacement Part:</span>
+                            <span>{matchedAlias}</span>
+                        </p>
+                    )}
 
                     {/* Rating Stats - Simplified */}
                     <div className="flex items-center gap-1 mb-3">

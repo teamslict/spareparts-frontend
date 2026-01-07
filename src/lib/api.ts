@@ -15,6 +15,13 @@ export interface Product {
     stockQty: number;
     compatibleModels: string[];
     slug: string; // usually ID or SKU-based slug
+    quantityDiscounts?: Array<{
+        promotionName: string;
+        minQuantity: number;
+        maxQuantity: number | null;
+        discountType: string;
+        discountValue: number;
+    }>;
 }
 
 export interface Category {
@@ -42,16 +49,19 @@ export const api = {
     /**
      * Get Products with optional filters
      */
-    getProducts: async (subdomain: string, params: {
+    getProducts: async (storeSlug: string, params: {
         category?: string;
         brand?: string;
         search?: string;
+        make?: string;
+        model?: string;
+        year?: string;
         page?: number;
         limit?: number;
     } = {}): Promise<ProductResponse> => {
         try {
             const query = new URLSearchParams({
-                subdomain,
+                subdomain: storeSlug,
                 page: (params.page || 1).toString(),
                 limit: (params.limit || 20).toString()
             });
@@ -59,6 +69,9 @@ export const api = {
             if (params.category && params.category !== 'All') query.append('category', params.category);
             if (params.brand && params.brand !== 'All') query.append('brand', params.brand);
             if (params.search) query.append('search', params.search);
+            if (params.make) query.append('make', params.make);
+            if (params.model) query.append('model', params.model);
+            if (params.year) query.append('year', params.year);
 
             const res = await fetch(`${API_URL}/api/public/spareparts/products?${query.toString()}`, {
                 next: { revalidate: 60 }
@@ -77,9 +90,9 @@ export const api = {
     /**
      * Get distinct categories
      */
-    getCategories: async (subdomain: string): Promise<Category[]> => {
+    getCategories: async (storeSlug: string): Promise<Category[]> => {
         try {
-            const res = await fetch(`${API_URL}/api/public/spareparts/categories?subdomain=${subdomain}`, {
+            const res = await fetch(`${API_URL}/api/public/spareparts/categories?subdomain=${storeSlug}`, {
                 next: { revalidate: 300 }
             });
             if (!res.ok) return [];
@@ -93,9 +106,9 @@ export const api = {
     /**
      * Get distinct brands
      */
-    getBrands: async (subdomain: string): Promise<Brand[]> => {
+    getBrands: async (storeSlug: string): Promise<Brand[]> => {
         try {
-            const res = await fetch(`${API_URL}/api/public/spareparts/brands?subdomain=${subdomain}`, {
+            const res = await fetch(`${API_URL}/api/public/spareparts/brands?subdomain=${storeSlug}`, {
                 next: { revalidate: 300 }
             });
             if (!res.ok) return [];
@@ -109,9 +122,9 @@ export const api = {
     /**
      * Get single product by ID/Slug
      */
-    getProduct: async (subdomain: string, slug: string): Promise<Product | null> => {
+    getProduct: async (storeSlug: string, slug: string): Promise<Product | null> => {
         try {
-            const res = await fetch(`${API_URL}/api/public/spareparts/products/${slug}?subdomain=${subdomain}`, {
+            const res = await fetch(`${API_URL}/api/public/spareparts/products/${slug}?subdomain=${storeSlug}`, {
                 next: { revalidate: 60 }
             });
             if (!res.ok) return null;
@@ -120,5 +133,62 @@ export const api = {
             console.error('API Error:', error);
             return null;
         }
+    },
+
+    /**
+     * Customer Authentication
+     */
+    registerCustomer: async (storeSlug: string, data: any) => {
+        const res = await fetch(`${API_URL}/api/public/spareparts/auth/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...data, subdomain: storeSlug })
+        });
+
+        if (!res.ok) {
+            const text = await res.text();
+            throw new Error(text || 'Registration failed');
+        }
+        return await res.json();
+    },
+
+    loginCustomer: async (storeSlug: string, data: any) => {
+        const res = await fetch(`${API_URL}/api/public/spareparts/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...data, subdomain: storeSlug })
+        });
+
+        if (!res.ok) {
+            const text = await res.text();
+            throw new Error(text || 'Login failed');
+        }
+        return await res.json();
+    },
+
+    /**
+     * Create Order (Checkout)
+     */
+    createOrder: async (storeSlug: string, data: {
+        customerId?: string;
+        customerName: string;
+        customerPhone: string;
+        shippingAddress: string;
+        items: { productId: string; quantity: number }[];
+    }) => {
+        const res = await fetch(`${API_URL}/api/public/spareparts/checkout`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...data, subdomain: storeSlug })
+        });
+
+        if (!res.ok) {
+            const json = await res.json().catch(() => null);
+            if (json?.error) {
+                throw new Error(`${json.error}: ${json.product} (available: ${json.available}, requested: ${json.requested})`);
+            }
+            throw new Error('Checkout failed');
+        }
+        return await res.json();
     }
 };

@@ -156,7 +156,13 @@ const TenantContext = createContext<TenantContextType>({
     refetch: () => { },
 });
 
-export function TenantProvider({ children }: { children: ReactNode }) {
+export function TenantProvider({
+    children,
+    storeSlug
+}: {
+    children: ReactNode;
+    storeSlug?: string;
+}) {
     const [tenant, setTenant] = useState<TenantConfig>(defaultTenant);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -166,23 +172,20 @@ export function TenantProvider({ children }: { children: ReactNode }) {
             setLoading(true);
             setError(null);
 
-            // Determine subdomain
-            let subdomain = 'demo';
-            if (typeof window !== 'undefined') {
-                const host = window.location.host;
-                if (host.includes('localhost')) {
-                    subdomain = process.env.NEXT_PUBLIC_DEFAULT_TENANT || 'demo';
-                } else {
-                    const parts = host.split('.');
-                    if (parts.length >= 3) {
-                        subdomain = parts[0];
-                    }
-                }
+            // Determine subdomain/slug
+            // If storeSlug is provided (Path-Based), use it.
+            // If not provided (Root Domain), assume 'default' or process.env logic
+            let slug = storeSlug || 'demo';
+
+            // If strictly root path is visited, we use 'default' or a specific ENV
+            if (!storeSlug) {
+                slug = process.env.NEXT_PUBLIC_DEFAULT_TENANT || 'demo';
             }
 
             // Fetch tenant config from backend
             const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-            const response = await fetch(`${apiUrl}/api/public/spareparts/config?subdomain=${subdomain}`, {
+            // Note: usage of 'subdomain' query param is legacy naming, backend treats it as the lookup key.
+            const response = await fetch(`${apiUrl}/api/public/spareparts/config?subdomain=${slug}`, {
                 next: { revalidate: 60 }, // Cache for 60 seconds
             });
 
@@ -193,7 +196,7 @@ export function TenantProvider({ children }: { children: ReactNode }) {
                 setTenant({
                     ...defaultTenant,
                     tenantId: data.tenantId || defaultTenant.tenantId,
-                    subdomain: data.subdomain || subdomain,
+                    subdomain: data.subdomain || slug,
                     storeName: data.config?.storeName || defaultTenant.storeName,
                     tagline: data.config?.tagline || defaultTenant.tagline,
                     logoUrl: data.config?.logoUrl,
@@ -235,7 +238,7 @@ export function TenantProvider({ children }: { children: ReactNode }) {
 
     useEffect(() => {
         fetchTenant();
-    }, []);
+    }, [storeSlug]);
 
     if (loading) {
         return (

@@ -7,8 +7,16 @@ import { useCart } from '@/lib/cart-store';
 import { useTenant } from '@/lib/tenant-context';
 
 export default function CartPage() {
-    const { items, updateQuantity, removeItem, getTotal, clearCart } = useCart();
+    const cart = useCart();
     const { tenant } = useTenant();
+
+    // Get store slug
+    const storeSlug = tenant?.subdomain || 'demo';
+
+    // Get items for this store
+    const items = cart.getItems(storeSlug);
+
+
 
     const formatPrice = (amount: number) => {
         return new Intl.NumberFormat('en-LK', {
@@ -27,7 +35,7 @@ export default function CartPage() {
                         <h1 className="text-2xl font-bold text-gray-800 mb-2">Your cart is empty</h1>
                         <p className="text-gray-500 mb-6">Looks like you haven&apos;t added any items to your cart yet.</p>
                         <Link
-                            href="/products"
+                            href={`/${storeSlug}/products`}
                             className="inline-block px-6 py-3 bg-[#C8102E] text-white font-semibold rounded hover:bg-[#A60D24] transition-colors"
                         >
                             Continue Shopping
@@ -61,7 +69,7 @@ export default function CartPage() {
                                     {/* Product */}
                                     <div className="col-span-12 md:col-span-6 flex items-center gap-4">
                                         <button
-                                            onClick={() => removeItem(item.productId)}
+                                            onClick={() => cart.removeItem(storeSlug, item.productId)}
                                             className="text-gray-400 hover:text-red-500 transition-colors"
                                         >
                                             <Trash2 size={18} />
@@ -76,7 +84,7 @@ export default function CartPage() {
                                             />
                                         </div>
                                         <div>
-                                            <Link href={`/products/${item.productId}`} className="font-medium text-gray-800 hover:text-[#C8102E]">
+                                            <Link href={`/${storeSlug}/products/${item.productId}`} className="font-medium text-gray-800 hover:text-[#C8102E]">
                                                 {item.name}
                                             </Link>
                                             <p className="text-sm text-gray-500">SKU: {item.sku}</p>
@@ -92,14 +100,14 @@ export default function CartPage() {
                                     {/* Quantity */}
                                     <div className="col-span-4 md:col-span-2 flex items-center justify-center gap-1">
                                         <button
-                                            onClick={() => updateQuantity(item.productId, item.quantity - 1)}
+                                            onClick={() => cart.updateQuantity(storeSlug, item.productId, item.quantity - 1)}
                                             className="w-8 h-8 border border-gray-300 rounded flex items-center justify-center hover:bg-gray-100"
                                         >
                                             <Minus size={14} />
                                         </button>
                                         <span className="w-10 text-center">{item.quantity}</span>
                                         <button
-                                            onClick={() => updateQuantity(item.productId, item.quantity + 1)}
+                                            onClick={() => cart.updateQuantity(storeSlug, item.productId, item.quantity + 1)}
                                             className="w-8 h-8 border border-gray-300 rounded flex items-center justify-center hover:bg-gray-100"
                                         >
                                             <Plus size={14} />
@@ -117,12 +125,12 @@ export default function CartPage() {
                             {/* Clear Cart */}
                             <div className="px-6 py-4 flex justify-between">
                                 <button
-                                    onClick={clearCart}
+                                    onClick={() => cart.clearCart(storeSlug)}
                                     className="text-sm text-gray-500 hover:text-red-500 transition-colors"
                                 >
                                     Clear Cart
                                 </button>
-                                <Link href="/products" className="text-sm text-[#C8102E] hover:underline">
+                                <Link href={`/${storeSlug}/products`} className="text-sm text-[#C8102E] hover:underline">
                                     Continue Shopping
                                 </Link>
                             </div>
@@ -137,7 +145,7 @@ export default function CartPage() {
                             <div className="space-y-3 border-b pb-4 mb-4">
                                 <div className="flex justify-between text-sm">
                                     <span className="text-gray-600">Subtotal</span>
-                                    <span>{formatPrice(getTotal())}</span>
+                                    <span>{formatPrice(cart.getTotal(storeSlug))}</span>
                                 </div>
                                 <div className="flex justify-between text-sm">
                                     <span className="text-gray-600">Shipping</span>
@@ -163,11 +171,11 @@ export default function CartPage() {
                             {/* Total */}
                             <div className="flex justify-between text-lg font-bold mb-6">
                                 <span>Total</span>
-                                <span style={{ color: tenant?.primaryColor || '#C8102E' }}>{formatPrice(getTotal())}</span>
+                                <span style={{ color: tenant?.primaryColor || '#C8102E' }}>{formatPrice(cart.getTotal(storeSlug))}</span>
                             </div>
 
                             <Link
-                                href="/checkout"
+                                href={`/${storeSlug}/checkout`}
                                 className="block w-full py-3 bg-[#C8102E] text-white text-center font-semibold rounded hover:bg-[#A60D24] transition-colors"
                             >
                                 Proceed to Checkout

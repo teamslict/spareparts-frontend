@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTenant } from '@/lib/tenant-context';
 
+import { api } from '@/lib/api';
+
 export default function RegisterPage() {
     const { tenant } = useTenant();
     const router = useRouter();
@@ -18,6 +20,8 @@ export default function RegisterPage() {
         businessName: '',
     });
 
+    const storeSlug = tenant?.subdomain || 'demo';
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -28,12 +32,16 @@ export default function RegisterPage() {
 
         setIsLoading(true);
 
-        // Simulate registration - in production, call /api/public/spareparts/customers/register
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-
-        // Redirect to login
-        router.push('/auth/login');
-        setIsLoading(false);
+        try {
+            await api.registerCustomer(storeSlug, formData);
+            alert('Account created successfully! Please sign in.');
+            router.push(`/${storeSlug}/auth/login`);
+        } catch (error: any) {
+            console.error(error);
+            alert(error.message || 'Registration failed');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -135,9 +143,9 @@ export default function RegisterPage() {
                             <input type="checkbox" required className="w-4 h-4 mt-1 text-[#C8102E] border-gray-300 rounded" />
                             <span className="ml-2 text-sm text-gray-600">
                                 I agree to the{' '}
-                                <Link href="/terms" className="text-[#C8102E] hover:underline">Terms & Conditions</Link>
+                                <Link href={`/${storeSlug}/terms`} className="text-[#C8102E] hover:underline">Terms & Conditions</Link>
                                 {' '}and{' '}
-                                <Link href="/privacy" className="text-[#C8102E] hover:underline">Privacy Policy</Link>
+                                <Link href={`/${storeSlug}/privacy`} className="text-[#C8102E] hover:underline">Privacy Policy</Link>
                             </span>
                         </div>
 
@@ -160,7 +168,7 @@ export default function RegisterPage() {
                     {/* Login Link */}
                     <p className="text-center text-sm text-gray-600">
                         Already have an account?{' '}
-                        <Link href="/auth/login" className="text-[#C8102E] font-medium hover:underline">
+                        <Link href={`/${storeSlug}/auth/login`} className="text-[#C8102E] font-medium hover:underline">
                             Sign in
                         </Link>
                     </p>

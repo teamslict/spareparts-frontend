@@ -30,12 +30,27 @@ export function Header() {
         }
     };
 
+    // Helper to format links
+    // If slug is 'default' or matches root logic, we can keep links relative or absolute
+    // But for path-based, we must prefix. 
+    // If subdomain is 'demo' or 'default', we assume root? Or standard path?
+    // Let's rely on the URL or Config. 
+    // Ideally, we want `/shop-x/products`. 
+    // If the user visited `/`, slug is 'demo' (based on current logic). 
+    // We should probably check if we are in a 'named' store path.
+
+    const getLink = (path: string) => {
+        // Current tenant.subdomain holds the slug (e.g., 'shop-x')
+        const slug = tenant?.subdomain || 'demo';
+        return `/${slug}${path}`;
+    };
+
     const navLinks = [
-        { href: '/', label: 'Home' },
-        { href: '/products', label: 'Products' },
-        { href: '/services', label: 'Services' },
-        { href: '/about', label: 'About' },
-        { href: '/contact', label: 'Contact' },
+        { href: getLink('/'), label: 'Home' },
+        { href: getLink('/products'), label: 'Products' },
+        { href: getLink('/services'), label: 'Services' },
+        { href: getLink('/about'), label: 'About' },
+        { href: getLink('/contact'), label: 'Contact' },
     ];
 
     return (
@@ -46,7 +61,7 @@ export function Header() {
             <div className="container-custom h-20 flex items-center justify-between gap-4 md:gap-8">
 
                 {/* 1. Logo */}
-                <Link href="/" className="flex-shrink-0 relative group">
+                <Link href={getLink('/')} className="flex-shrink-0 relative group">
                     {tenant?.logoUrl ? (
                         <div className="relative h-10 w-40 hover:opacity-90 transition-opacity">
                             <Image
@@ -106,17 +121,17 @@ export function Header() {
                 <div className="flex items-center gap-3 md:gap-5">
 
                     {/* Account */}
-                    <Link href="/auth/login" className="hidden sm:flex items-center gap-2 group p-2 rounded-full hover:bg-gray-50 transition-colors">
+                    <Link href={getLink('/auth/login')} className="hidden sm:flex items-center gap-2 group p-2 rounded-full hover:bg-gray-50 transition-colors">
                         <User size={20} className="text-gray-700 group-hover:text-red-600 transition-colors" />
                         <span className="text-xs font-medium text-gray-600 group-hover:text-red-600 hidden xl:block">Sign In</span>
                     </Link>
 
                     {/* Cart */}
-                    <Link href="/cart" className="relative p-2 rounded-full hover:bg-gray-50 transition-colors group">
+                    <Link href={getLink('/cart')} className="relative p-2 rounded-full hover:bg-gray-50 transition-colors group">
                         <ShoppingCart size={22} className="text-gray-700 group-hover:text-red-600 transition-colors" />
-                        {getItemCount() > 0 && (
+                        {getItemCount(tenant?.subdomain || 'demo') > 0 && (
                             <span className="absolute top-0 right-0 w-4 h-4 bg-red-600 text-white text-[10px] font-bold flex items-center justify-center rounded-full animate-bounce-short">
-                                {getItemCount()}
+                                {getItemCount(tenant?.subdomain || 'demo')}
                             </span>
                         )}
                     </Link>

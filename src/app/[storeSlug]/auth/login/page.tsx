@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTenant } from '@/lib/tenant-context';
 
+import { api } from '@/lib/api';
+
 export default function LoginPage() {
     const { tenant } = useTenant();
     const router = useRouter();
@@ -14,16 +16,31 @@ export default function LoginPage() {
         password: '',
     });
 
+    const storeSlug = tenant?.subdomain || 'demo';
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
 
-        // Simulate login - in production, call /api/public/spareparts/customers/login
-        await new Promise((resolve) => setTimeout(resolve, 1500));
+        try {
+            const data = await api.loginCustomer(storeSlug, formData);
 
-        // Redirect to account page
-        router.push('/account');
-        setIsLoading(false);
+            // Store token in localStorage for now
+            // In a real production app, this should be handled by httpOnly cookies or NextAuth
+            localStorage.setItem('spareparts_token', data.token);
+            localStorage.setItem('spareparts_user', JSON.stringify(data.user));
+
+            console.log('Login success:', data.user.name);
+
+            // Redirect to home or account
+            router.push(`/${storeSlug}`);
+            router.refresh(); // Refresh to update UI state if we had a user listener
+        } catch (error: any) {
+            console.error(error);
+            alert(error.message || 'Login failed');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -67,7 +84,7 @@ export default function LoginPage() {
                                 <input type="checkbox" className="w-4 h-4 text-[#C8102E] border-gray-300 rounded" />
                                 <span className="ml-2 text-sm text-gray-600">Remember me</span>
                             </label>
-                            <Link href="/auth/forgot-password" className="text-sm text-[#C8102E] hover:underline">
+                            <Link href={`/${storeSlug}/auth/forgot-password`} className="text-sm text-[#C8102E] hover:underline">
                                 Forgot password?
                             </Link>
                         </div>
@@ -91,7 +108,7 @@ export default function LoginPage() {
                     {/* Register Link */}
                     <p className="text-center text-sm text-gray-600">
                         Don&apos;t have an account?{' '}
-                        <Link href="/auth/register" className="text-[#C8102E] font-medium hover:underline">
+                        <Link href={`/${storeSlug}/auth/register`} className="text-[#C8102E] font-medium hover:underline">
                             Create one
                         </Link>
                     </p>

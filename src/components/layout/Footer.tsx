@@ -8,6 +8,12 @@ import Image from 'next/image';
 export function Footer() {
     const { tenant } = useTenant();
 
+    const getLink = (path: string) => {
+        const slug = tenant?.subdomain;
+        if (!slug || slug === 'default' || slug === 'demo') return path;
+        return `/${slug}${path}`;
+    };
+
     return (
         <footer className="bg-slate-900 text-slate-400 border-t border-slate-800 py-20">
             <div className="max-w-7xl mx-auto px-6">
@@ -37,11 +43,11 @@ export function Footer() {
                         <h4 className="text-white font-bold mb-8">Quick Links</h4>
                         <ul className="space-y-4 text-sm">
                             {[
-                                { label: 'About Us', href: '/about' },
-                                { label: 'Shop Products', href: '/products' },
-                                { label: 'Our Services', href: '/services' },
-                                { label: 'Contact Support', href: '/contact' },
-                                { label: 'Terms & Conditions', href: '/terms' },
+                                { label: 'About Us', href: getLink('/about') },
+                                { label: 'Shop Products', href: getLink('/products') },
+                                { label: 'Our Services', href: getLink('/services') },
+                                { label: 'Contact Support', href: getLink('/contact') },
+                                { label: 'Terms & Conditions', href: getLink('/terms') },
                             ].map(link => (
                                 <li key={link.href}>
                                     <Link href={link.href} className="hover:text-red-500 transition-colors flex items-center gap-2 group">
@@ -53,7 +59,7 @@ export function Footer() {
                         </ul>
                     </div>
 
-                    {/* 3. Customer Care */}
+                    {/* 3. Customer Care - No links to update here currently */}
                     <div>
                         <h4 className="text-white font-bold mb-8">Contact Us</h4>
                         <ul className="space-y-4 text-sm">
@@ -115,8 +121,8 @@ export function Footer() {
                     <div className="flex flex-col md:flex-row items-center gap-6 text-sm text-slate-500">
                         <p>&copy; {new Date().getFullYear()} {tenant?.storeName || 'SLICT Auto Parts Web'}. All rights reserved.</p>
                         <div className="flex items-center gap-6">
-                            <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
-                            <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
+                            <Link href={getLink('/privacy')} className="hover:text-white transition-colors">Privacy Policy</Link>
+                            <Link href={getLink('/terms')} className="hover:text-white transition-colors">Terms of Service</Link>
                         </div>
                     </div>
                 </div>

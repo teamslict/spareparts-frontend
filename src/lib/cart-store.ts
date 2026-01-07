@@ -10,74 +10,103 @@ export interface CartItem {
     quantity: number;
 }
 
+// Update interface to support namespaces
 interface CartState {
-    items: CartItem[];
-    addItem: (item: Omit<CartItem, 'quantity'>, quantity?: number) => void;
-    removeItem: (productId: string) => void;
-    updateQuantity: (productId: string, quantity: number) => void;
-    clearCart: () => void;
-    getTotal: () => number;
-    getItemCount: () => number;
+    // Key is storeSlug, Value is items array
+    carts: Record<string, CartItem[]>;
+
+    // Actions now require storeSlug
+    addItem: (storeSlug: string, item: Omit<CartItem, 'quantity'>, quantity?: number) => void;
+    removeItem: (storeSlug: string, productId: string) => void;
+    updateQuantity: (storeSlug: string, productId: string, quantity: number) => void;
+    clearCart: (storeSlug: string) => void;
+
+    // Selectors
+    getItems: (storeSlug: string) => CartItem[];
+    getTotal: (storeSlug: string) => number;
+    getItemCount: (storeSlug: string) => number;
 }
 
 export const useCart = create<CartState>()(
     persist(
         (set, get) => ({
-            items: [],
+            carts: {},
 
-            addItem: (item, quantity = 1) => {
+            addItem: (storeSlug, item, quantity = 1) => {
                 set((state) => {
-                    const existingItem = state.items.find((i) => i.productId === item.productId);
+                    const currentCart = state.carts[storeSlug] || [];
+                    const existingItem = currentCart.find((i) => i.productId === item.productId);
 
+                    let newCart;
                     if (existingItem) {
-                        return {
-                            items: state.items.map((i) =>
-                                i.productId === item.productId
-                                    ? { ...i, quantity: i.quantity + quantity }
-                                    : i
-                            ),
-                        };
+                        newCart = currentCart.map((i) =>
+                            i.productId === item.productId
+                                ? { ...i, quantity: i.quantity + quantity }
+                                : i
+                        );
+                    } else {
+                        newCart = [...currentCart, { ...item, quantity }];
                     }
 
                     return {
-                        items: [...state.items, { ...item, quantity }],
+                        carts: {
+                            ...state.carts,
+                            [storeSlug]: newCart
+                        }
                     };
                 });
             },
 
-            removeItem: (productId) => {
+            removeItem: (storeSlug, productId) => {
                 set((state) => ({
-                    items: state.items.filter((i) => i.productId !== productId),
+                    carts: {
+                        ...state.carts,
+                        [storeSlug]: (state.carts[storeSlug] || []).filter((i) => i.productId !== productId)
+                    }
                 }));
             },
 
-            updateQuantity: (productId, quantity) => {
+            updateQuantity: (storeSlug, productId, quantity) => {
                 if (quantity <= 0) {
-                    get().removeItem(productId);
+                    get().removeItem(storeSlug, productId);
                     return;
                 }
 
                 set((state) => ({
-                    items: state.items.map((i) =>
-                        i.productId === productId ? { ...i, quantity } : i
-                    ),
+                    carts: {
+                        ...state.carts,
+                        [storeSlug]: (state.carts[storeSlug] || []).map((i) =>
+                            i.productId === productId ? { ...i, quantity } : i
+                        )
+                    }
                 }));
             },
 
-            clearCart: () => {
-                set({ items: [] });
+            clearCart: (storeSlug) => {
+                set((state) => ({
+                    carts: {
+                        ...state.carts,
+                        [storeSlug]: []
+                    }
+                }));
             },
 
-            getTotal: () => {
-                return get().items.reduce((total, item) => total + item.price * item.quantity, 0);
+            getItems: (storeSlug) => {
+                return get().carts[storeSlug] || [];
             },
 
-            getItemCount: () => {
-                return get().items.reduce((count, item) => count + item.quantity, 0);
+            getTotal: (storeSlug) => {
+                const items = get().carts[storeSlug] || [];
+                return items.reduce((total, item) => total + item.price * item.quantity, 0);
+            },
+
+            getItemCount: (storeSlug) => {
+                const items = get().carts[storeSlug] || [];
+                return items.reduce((count, item) => count + item.quantity, 0);
             },
         }),
         {
-            name: 'spareparts-cart',
+            name: 'spareparts-cart-multitenant', // New key to avoid conflicts with old storage
         }
     )
 );

@@ -55,8 +55,12 @@ const sidebarItems: AccordionItem[] = [
     { name: 'SUZUKI', slug: 'suzuki' },
 ];
 
+import { useTenant } from '@/lib/tenant-context';
+
 export function ProductSidebar() {
     const [openItems, setOpenItems] = useState<string[]>([]);
+    const { tenant } = useTenant();
+    const storeSlug = tenant?.subdomain || 'demo';
 
     const toggleItem = (slug: string) => {
         setOpenItems((prev) =>
@@ -72,13 +76,18 @@ export function ProductSidebar() {
                         className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors"
                         onClick={() => item.subItems && toggleItem(item.slug)}
                     >
-                        <Link
-                            href={`/brand/${item.slug}`}
-                            onClick={(e) => item.subItems && e.preventDefault()}
-                            className="font-medium text-gray-800 text-sm"
-                        >
-                            {item.name}
-                        </Link>
+                        {/* Parent Category Link or Div */}
+                        {item.subItems ? (
+                            <span className="font-medium text-gray-800 text-sm">{item.name}</span>
+                        ) : (
+                            <Link
+                                href={`/${storeSlug}/products?brand=${item.slug}`}
+                                className="font-medium text-gray-800 text-sm block flex-1"
+                            >
+                                {item.name}
+                            </Link>
+                        )}
+
                         {item.subItems && (
                             <ChevronDown
                                 size={18}
@@ -94,7 +103,7 @@ export function ProductSidebar() {
                             {item.subItems.map((subItem) => (
                                 <Link
                                     key={subItem.slug}
-                                    href={`/brand/${item.slug}/${subItem.slug}`}
+                                    href={`/${storeSlug}/products?brand=${item.slug}&model=${subItem.slug}`}
                                     className="block px-8 py-2 text-sm text-gray-600 hover:text-[#C8102E] transition-colors"
                                 >
                                     {subItem.name}
