@@ -24,9 +24,9 @@ const filterParts = [
 
 export default function HomePage({ params }: { params?: { storeSlug: string } }) {
   return (
-    <div className="flex flex-col gap-10 pb-12 bg-gray-50/50">
+    <div className="flex flex-col gap-10 pb-12 bg-slate-50 min-h-screen text-slate-900">
       {/* Hero Section with Categories Sidebar */}
-      <section className="bg-white pt-6 pb-2 shadow-sm">
+      <section className="pt-6 pb-2">
         <div className="container-custom">
           <div className="flex flex-col lg:flex-row gap-6">
             {/* Categories Sidebar - Hidden on mobile, visible on lg */}

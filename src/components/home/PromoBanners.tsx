@@ -8,19 +8,19 @@ import { PLACEHOLDER_IMAGE } from '@/lib/constants';
 const defaultBanners = [
     {
         id: '1',
-        title: 'Car Audio',
-        subtitle: 'Super Natural Sound',
+        title: 'Premium Car Audio',
+        subtitle: 'High-Fidelity Sound',
         imageUrl: '',
         link: '/category/audio',
         bgColor: '#1E3A5F',
     },
     {
         id: '2',
-        title: 'All - New',
-        subtitle: 'Performance Parts',
+        title: 'Performance Parts',
+        subtitle: 'Upgrade Your Ride',
         imageUrl: '',
         link: '/category/performance',
-        bgColor: '#F5F5F5',
+        bgColor: '#F1F5F9', // Slightly darker white/gray
     },
 ];
 

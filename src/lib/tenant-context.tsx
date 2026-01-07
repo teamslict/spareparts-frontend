@@ -71,6 +71,23 @@ export interface TenantConfig {
         slug: string;
         imageUrl: string;
     }[];
+
+    // Dynamic Pages Content (About, Contact, etc.)
+    aboutUs?: {
+        story?: string;
+        mission?: string;
+        vision?: string;
+        stats?: { label: string; value: string; }[];
+        values?: { title: string; desc: string; }[];
+    };
+
+    // Detailed Contact Info
+    businessHours?: {
+        weekday?: string;
+        weekend?: string;
+        text?: string;
+    };
+    mapUrl?: string; // Embed URL for Google Maps
 }
 
 interface TenantContextType {

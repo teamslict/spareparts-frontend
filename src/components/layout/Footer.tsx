@@ -1,7 +1,7 @@
 "use client";
 
 import Link from 'next/link';
-import { Facebook, Twitter, Instagram, Linkedin, Mail, Phone, MapPin, Send, ArrowRight } from 'lucide-react';
+import { Facebook, Twitter, Instagram, Linkedin, MapPin, Phone, Mail, ArrowRight } from 'lucide-react';
 import { useTenant } from '@/lib/tenant-context';
 import Image from 'next/image';
 
@@ -15,14 +15,15 @@ export function Footer() {
     };
 
     return (
-        <footer className="bg-slate-900 text-slate-400 border-t border-slate-800 py-20">
-            <div className="max-w-7xl mx-auto px-6">
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-16">
+        <footer className="w-full bg-slate-50 border-t border-slate-200 font-inter">
+            {/* Main Footer Content */}
+            <div className="container-custom mx-auto px-4 md:px-6 py-16">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8">
 
-                    {/* 1. Brand & About */}
-                    <div className="space-y-6">
+                    {/* Brand Column (Span 4) */}
+                    <div className="lg:col-span-4 space-y-6">
                         {tenant?.logoUrl ? (
-                            <div className="relative h-10 w-48 opacity-90 grayscale hover:grayscale-0 transition-all duration-500">
+                            <div className="relative h-10 w-40">
                                 <Image
                                     src={tenant.logoUrl}
                                     alt={tenant.storeName}
@@ -31,27 +32,64 @@ export function Footer() {
                                 />
                             </div>
                         ) : (
-                            <h3 className="text-2xl font-bold text-white tracking-tight">{tenant?.storeName}</h3>
+                            <div className="inline-flex items-center gap-2">
+                                <div className="w-10 h-10 bg-slate-900 rounded-lg flex items-center justify-center text-white font-bold text-xl">S</div>
+                                <span className="text-xl font-bold text-slate-900 tracking-tight">{tenant?.storeName || 'Slict'}</span>
+                            </div>
                         )}
-                        <p className="text-sm leading-relaxed max-w-xs text-slate-500">
-                            {tenant?.tagline || 'Your trusted partner for high-quality automotive spare parts and accessories.'}
+                        <p className="text-sm leading-relaxed text-slate-500 max-w-sm">
+                            Your trusted partner for premium automotive parts. We combine quality products with expert support to keep you moving forward.
                         </p>
+                        <div className="flex items-center gap-3 pt-2">
+                            {[
+                                { icon: Facebook, href: tenant?.facebookUrl },
+                                { icon: Twitter, href: '#' },
+                                { icon: Instagram, href: tenant?.instagramUrl },
+                                { icon: Linkedin, href: tenant?.linkedinUrl }
+                            ].map((Social, idx) => (
+                                <a
+                                    key={idx}
+                                    href={Social.href || '#'}
+                                    className="w-9 h-9 rounded-full bg-white border border-slate-200 text-slate-500 flex items-center justify-center transition-all hover:bg-slate-900 hover:text-white hover:border-slate-900"
+                                >
+                                    <Social.icon size={16} />
+                                </a>
+                            ))}
+                        </div>
                     </div>
 
-                    {/* 2. Quick Links */}
-                    <div>
-                        <h4 className="text-white font-bold mb-8">Quick Links</h4>
-                        <ul className="space-y-4 text-sm">
+                    {/* Quick Links (Span 2) */}
+                    <div className="lg:col-span-2 lg:col-start-6">
+                        <h3 className="text-xs font-bold text-slate-900 tracking-wider uppercase mb-6">Shop</h3>
+                        <ul className="space-y-3">
                             {[
-                                { label: 'About Us', href: getLink('/about') },
-                                { label: 'Shop Products', href: getLink('/products') },
-                                { label: 'Our Services', href: getLink('/services') },
-                                { label: 'Contact Support', href: getLink('/contact') },
-                                { label: 'Terms & Conditions', href: getLink('/terms') },
-                            ].map(link => (
-                                <li key={link.href}>
-                                    <Link href={link.href} className="hover:text-red-500 transition-colors flex items-center gap-2 group">
-                                        <ArrowRight size={12} className="opacity-0 -ml-4 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300 text-red-500" />
+                                { label: 'New Arrivals', href: getLink('/products?sort=new') },
+                                { label: 'Best Sellers', href: getLink('/products?sort=bestsellers') },
+                                { label: 'Special Offers', href: getLink('/products?discounted=true') },
+                                { label: 'All Categories', href: getLink('/categories') },
+                            ].map((link) => (
+                                <li key={link.label}>
+                                    <Link href={link.href} className="text-sm text-slate-500 hover:text-slate-900 transition-colors inline-flex items-center group">
+                                        {link.label}
+                                        <ArrowRight size={12} className="ml-1 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    {/* Support (Span 2) */}
+                    <div className="lg:col-span-2">
+                        <h3 className="text-xs font-bold text-slate-900 tracking-wider uppercase mb-6">Support</h3>
+                        <ul className="space-y-3">
+                            {[
+                                { label: 'Order Tracking', href: getLink('/track-order') },
+                                { label: 'Return Policy', href: getLink('/returns') },
+                                { label: 'Shipping Info', href: getLink('/shipping') },
+                                { label: 'Help Center', href: getLink('/help') },
+                            ].map((link) => (
+                                <li key={link.label}>
+                                    <Link href={link.href} className="text-sm text-slate-500 hover:text-slate-900 transition-colors inline-block">
                                         {link.label}
                                     </Link>
                                 </li>
@@ -59,71 +97,53 @@ export function Footer() {
                         </ul>
                     </div>
 
-                    {/* 3. Customer Care - No links to update here currently */}
-                    <div>
-                        <h4 className="text-white font-bold mb-8">Contact Us</h4>
-                        <ul className="space-y-4 text-sm">
-                            <li className="flex items-start gap-4 group">
-                                <MapPin size={20} className="mt-0.5 text-slate-600 group-hover:text-red-500 transition-colors" />
-                                <span className="leading-relaxed">{tenant?.address || '123 Auto Parts St, Colombo, Sri Lanka'}</span>
-                            </li>
-                            <li className="flex items-center gap-4 group">
-                                <Phone size={20} className="text-slate-600 group-hover:text-red-500 transition-colors" />
-                                <span>{tenant?.contactPhone || '+94 77 123 4567'}</span>
-                            </li>
-                            <li className="flex items-center gap-4 group">
-                                <Mail size={20} className="text-slate-600 group-hover:text-red-500 transition-colors" />
-                                <span>{tenant?.contactEmail || 'support@slictauto.lk'}</span>
-                            </li>
-                        </ul>
-                    </div>
-
-                    {/* 4. Newsletter */}
-                    <div>
-                        <h4 className="text-white font-bold mb-8">Newsletter</h4>
-                        <p className="text-sm text-slate-500 mb-6">Subscribe to receive updates, access to exclusive deals, and more.</p>
-                        <form className="space-y-4">
-                            <div className="relative">
-                                <input
-                                    type="email"
-                                    placeholder="Enter your email"
-                                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 h-12 text-sm focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-slate-600 text-white"
-                                />
+                    {/* Contact (Span 3) */}
+                    <div className="lg:col-span-3">
+                        <h3 className="text-xs font-bold text-slate-900 tracking-wider uppercase mb-6">Contact Us</h3>
+                        <div className="space-y-4">
+                            <div className="flex items-start gap-3 group">
+                                <div className="mt-0.5 w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0 text-slate-600 group-hover:bg-slate-200 transition-colors">
+                                    <MapPin size={16} />
+                                </div>
+                                <div>
+                                    <p className="text-sm font-medium text-slate-900">Headquarters</p>
+                                    <p className="text-sm text-slate-500 leading-relaxed mt-0.5">{tenant?.address || '123 Main Street, Colombo, Sri Lanka'}</p>
+                                </div>
                             </div>
-                            <button className="w-full bg-red-600 hover:bg-red-700 text-white font-bold h-12 rounded-lg text-sm transition-all duration-300 transform active:scale-[0.98] flex items-center justify-center gap-2">
-                                Subscribe Now <Send size={14} />
-                            </button>
-                        </form>
-                    </div>
-                </div>
-
-                {/* Bottom Row - Massive Separation */}
-                <div className="mt-20 pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-8">
-                    {/* Left Side: Social Icons */}
-                    <div className="flex items-center gap-6">
-                        {[
-                            { icon: Facebook, href: tenant?.facebookUrl, color: 'hover:text-blue-500' },
-                            { icon: Instagram, href: tenant?.instagramUrl, color: 'hover:text-pink-500' },
-                            { icon: Linkedin, href: tenant?.linkedinUrl, color: 'hover:text-blue-400' },
-                            { icon: Twitter, href: '#', color: 'hover:text-sky-400' }
-                        ].map((Social, idx) => (
-                            <a
-                                key={idx}
-                                href={Social.href || '#'}
-                                className={`text-slate-500 transition-colors transform hover:scale-110 ${Social.color}`}
-                            >
-                                <Social.icon size={22} />
-                            </a>
-                        ))}
-                    </div>
-
-                    {/* Right Side: Copyright & Links */}
-                    <div className="flex flex-col md:flex-row items-center gap-6 text-sm text-slate-500">
-                        <p>&copy; {new Date().getFullYear()} {tenant?.storeName || 'SLICT Auto Parts Web'}. All rights reserved.</p>
-                        <div className="flex items-center gap-6">
-                            <Link href={getLink('/privacy')} className="hover:text-white transition-colors">Privacy Policy</Link>
-                            <Link href={getLink('/terms')} className="hover:text-white transition-colors">Terms of Service</Link>
+                            <div className="flex items-center gap-3 group">
+                                <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0 text-slate-600 group-hover:bg-slate-200 transition-colors">
+                                    <Phone size={16} />
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-sm font-medium text-slate-900">Phone Support</span>
+                                    <span className="text-sm text-slate-500">{tenant?.contactPhone || '+94 77 123 4567'}</span>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-3 group">
+                                <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0 text-slate-600 group-hover:bg-slate-200 transition-colors">
+                                    <Mail size={16} />
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-sm font-medium text-slate-900">Email Us</span>
+                                    <span className="text-sm text-slate-500">{tenant?.contactEmail || 'sales@slict.lk'}</span>
+                                </div>
+                            </div>
                         </div>
+                    </div>
+
+                </div>
+            </div>
+
+            {/* Bottom Bar */}
+            <div className="border-t border-slate-200 bg-slate-50/50">
+                <div className="container-custom mx-auto px-4 md:px-6 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <p className="text-xs text-slate-400">
+                        &copy; {new Date().getFullYear()} {tenant?.storeName || 'Slict'}. All rights reserved.
+                    </p>
+                    <div className="flex items-center gap-6">
+                        <Link href={getLink('/privacy')} className="text-xs text-slate-500 hover:text-slate-900 transition-colors font-medium">Privacy Policy</Link>
+                        <Link href={getLink('/terms')} className="text-xs text-slate-500 hover:text-slate-900 transition-colors font-medium">Terms of Service</Link>
+                        <Link href={getLink('/sitemap')} className="text-xs text-slate-500 hover:text-slate-900 transition-colors font-medium">Sitemap</Link>
                     </div>
                 </div>
             </div>
