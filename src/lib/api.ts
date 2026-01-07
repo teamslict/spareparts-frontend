@@ -1,7 +1,7 @@
 
 import { TenantConfig } from './tenant-context';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://erp.slict.lk';
 
 export interface Product {
     id: string;

@@ -200,7 +200,7 @@ export function TenantProvider({
             }
 
             // Fetch tenant config from backend
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://erp.slict.lk';
             // Note: usage of 'subdomain' query param is legacy naming, backend treats it as the lookup key.
             const response = await fetch(`${apiUrl}/api/public/spareparts/config?subdomain=${slug}`, {
                 next: { revalidate: 60 }, // Cache for 60 seconds
