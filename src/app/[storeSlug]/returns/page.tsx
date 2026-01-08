@@ -2,46 +2,45 @@
 
 import { useTenant } from '@/lib/tenant-context';
 import { RefreshCcw, ShieldCheck, Clock } from 'lucide-react';
+import { Section, Surface, Grid } from '@/components/ui';
 
 export default function ReturnsPage() {
     const { tenant } = useTenant();
 
     return (
-        <div className="bg-slate-50 min-h-screen pb-20">
-            <section className="bg-slate-900 text-white py-16">
-                <div className="max-w-4xl mx-auto px-6 text-center">
-                    <h1 className="text-3xl md:text-4xl font-bold mb-4">Returns & Refunds</h1>
-                    <p className="text-slate-400">Simple and transparent policies for your peace of mind.</p>
-                </div>
-            </section>
+        <div className="bg-slate-50 min-h-screen">
+            <Section className="bg-gray-900 text-white text-center">
+                <h1 className="text-3xl md:text-4xl font-bold mb-4">Returns & Refunds</h1>
+                <p className="text-slate-400">Simple and transparent policies for your peace of mind.</p>
+            </Section>
 
-            <div className="max-w-4xl mx-auto px-6 -mt-8">
-                <div className="grid md:grid-cols-3 gap-6 mb-12">
-                    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 text-center">
+            <Section>
+                <Grid minWidth="250px" gap="md" className="mb-12">
+                    <Surface className="text-center p-6">
                         <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
                             <Clock size={24} />
                         </div>
                         <h3 className="font-bold text-slate-900 mb-2">7 Days Return</h3>
                         <p className="text-sm text-slate-500">Return eligible items within 7 days of delivery</p>
-                    </div>
-                    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 text-center">
+                    </Surface>
+                    <Surface className="text-center p-6">
                         <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
                             <RefreshCcw size={24} />
                         </div>
                         <h3 className="font-bold text-slate-900 mb-2">Easy Process</h3>
                         <p className="text-sm text-slate-500">Hassle-free return initiation via support</p>
-                    </div>
-                    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 text-center">
+                    </Surface>
+                    <Surface className="text-center p-6">
                         <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
                             <ShieldCheck size={24} />
                         </div>
                         <h3 className="font-bold text-slate-900 mb-2">Full Refund</h3>
                         <p className="text-sm text-slate-500">Get your money back for defective items</p>
-                    </div>
-                </div>
+                    </Surface>
+                </Grid>
 
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 md:p-12 prose prose-slate max-w-none">
-                    <h2 className="text-slate-900">Return Eligibility</h2>
+                <Surface padding="lg" className="prose prose-slate max-w-none">
+                    <h2 className="text-slate-900 mt-0">Return Eligibility</h2>
                     <p>
                         To be eligible for a return, your item must be in the same condition that you received it, unworn or unused, with tags, and in its original packaging. You’ll also need the receipt or proof of purchase.
                     </p>
@@ -73,8 +72,8 @@ export default function ReturnsPage() {
                             Contact Support
                         </a>
                     </div>
-                </div>
-            </div>
+                </Surface>
+            </Section>
         </div>
     );
 }

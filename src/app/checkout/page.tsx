@@ -5,6 +5,7 @@ import { useCart } from '@/lib/cart-store';
 import { useTenant } from '@/lib/tenant-context';
 import { useRouter, useParams } from 'next/navigation';
 import { CreditCard, Banknote, Building2, CheckCircle } from 'lucide-react';
+import { Section, Container, Grid, Surface } from '@/components/ui';
 
 type PaymentMethod = 'COD' | 'BANK' | 'CREDIT';
 
@@ -76,29 +77,31 @@ export default function CheckoutPage() {
 
     if (orderPlaced) {
         return (
-            <div className="bg-gray-50 min-h-screen py-12">
-                <div className="container-custom max-w-xl">
-                    <div className="bg-white rounded-lg p-8 text-center">
-                        <CheckCircle size={64} className="mx-auto text-green-500 mb-4" />
-                        <h1 className="text-2xl font-bold text-gray-800 mb-2">Order Placed Successfully!</h1>
-                        <p className="text-gray-500 mb-6">
-                            Thank you for your order. We will contact you shortly to confirm your order.
-                        </p>
-                        <button
-                            onClick={() => router.push('/')}
-                            className="px-6 py-3 bg-[#C8102E] text-white font-semibold rounded hover:bg-[#A60D24] transition-colors"
-                        >
-                            Continue Shopping
-                        </button>
+            <div className="bg-gray-50 min-h-screen">
+                <Section>
+                    <div className="max-w-xl mx-auto">
+                        <Surface className="text-center p-8">
+                            <CheckCircle size={64} className="mx-auto text-green-500 mb-4" />
+                            <h1 className="text-2xl font-bold text-gray-800 mb-2">Order Placed Successfully!</h1>
+                            <p className="text-gray-500 mb-6">
+                                Thank you for your order. We will contact you shortly to confirm your order.
+                            </p>
+                            <button
+                                onClick={() => router.push('/')}
+                                className="px-6 py-3 bg-[#C8102E] text-white font-semibold rounded hover:bg-[#A60D24] transition-colors"
+                            >
+                                Continue Shopping
+                            </button>
+                        </Surface>
                     </div>
-                </div>
+                </Section>
             </div>
         );
     }
 
     return (
-        <div className="bg-gray-50 min-h-screen py-8">
-            <div className="container-custom">
+        <div className="bg-gray-50 min-h-screen">
+            <Section>
                 <h1 className="text-2xl font-bold text-gray-800 mb-6">Checkout</h1>
 
                 <form onSubmit={handleSubmit}>
@@ -106,7 +109,7 @@ export default function CheckoutPage() {
                         {/* Customer Info */}
                         <div className="lg:col-span-2 space-y-6">
                             {/* Contact Information */}
-                            <div className="bg-white rounded-lg p-6">
+                            <Surface>
                                 <h2 className="text-lg font-bold text-gray-800 mb-4">Contact Information</h2>
                                 <div className="grid md:grid-cols-2 gap-4">
                                     <div className="md:col-span-2">
@@ -142,10 +145,10 @@ export default function CheckoutPage() {
                                         />
                                     </div>
                                 </div>
-                            </div>
+                            </Surface>
 
                             {/* Shipping Address */}
-                            <div className="bg-white rounded-lg p-6">
+                            <Surface>
                                 <h2 className="text-lg font-bold text-gray-800 mb-4">Shipping Address</h2>
                                 <div className="grid md:grid-cols-2 gap-4">
                                     <div className="md:col-span-2">
@@ -171,10 +174,10 @@ export default function CheckoutPage() {
                                         />
                                     </div>
                                 </div>
-                            </div>
+                            </Surface>
 
                             {/* Payment Method */}
-                            <div className="bg-white rounded-lg p-6">
+                            <Surface>
                                 <h2 className="text-lg font-bold text-gray-800 mb-4">Payment Method</h2>
                                 <div className="space-y-3">
                                     {/* Cash on Delivery */}
@@ -237,10 +240,10 @@ export default function CheckoutPage() {
                                         </p>
                                     </div>
                                 )}
-                            </div>
+                            </Surface>
 
                             {/* Order Notes */}
-                            <div className="bg-white rounded-lg p-6">
+                            <Surface>
                                 <h2 className="text-lg font-bold text-gray-800 mb-4">Order Notes (Optional)</h2>
                                 <textarea
                                     name="notes"
@@ -250,12 +253,12 @@ export default function CheckoutPage() {
                                     placeholder="Any special instructions for your order..."
                                     className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-red-500"
                                 />
-                            </div>
+                            </Surface>
                         </div>
 
                         {/* Order Summary */}
                         <div className="lg:col-span-1">
-                            <div className="bg-white rounded-lg p-6 sticky top-4">
+                            <Surface className="sticky top-4">
                                 <h2 className="text-lg font-bold text-gray-800 mb-4">Order Summary</h2>
 
                                 {/* Items */}
@@ -294,11 +297,11 @@ export default function CheckoutPage() {
                                 >
                                     {isSubmitting ? 'Placing Order...' : 'Place Order'}
                                 </button>
-                            </div>
+                            </Surface>
                         </div>
                     </div>
                 </form>
-            </div>
+            </Section>
         </div>
     );
 }

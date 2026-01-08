@@ -4,8 +4,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTenant } from '@/lib/tenant-context';
-
 import { api } from '@/lib/api';
+import { Surface, Section } from '@/components/ui';
 
 export default function RegisterPage() {
     const { tenant } = useTenant();
@@ -49,12 +49,12 @@ export default function RegisterPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
-            <div className="max-w-md w-full">
-                <div className="bg-white rounded-lg shadow-lg p-8">
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <Section className="w-full max-w-lg">
+                <Surface padding="lg">
                     {/* Header */}
                     <div className="text-center mb-8">
-                        <h1 className="text-2xl font-bold text-gray-800 mb-2">Create Account</h1>
+                        <h1 className="text-2xl font-bold text-gray-900 mb-2">Create Account</h1>
                         <p className="text-gray-500">Join {tenant?.storeName || 'our store'} today</p>
                     </div>
 
@@ -68,7 +68,7 @@ export default function RegisterPage() {
                                 value={formData.name}
                                 onChange={handleChange}
                                 required
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-gray-50 focus:bg-white transition-colors"
                                 placeholder="John Doe"
                             />
                         </div>
@@ -81,7 +81,7 @@ export default function RegisterPage() {
                                 value={formData.email}
                                 onChange={handleChange}
                                 required
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-gray-50 focus:bg-white transition-colors"
                                 placeholder="you@example.com"
                             />
                         </div>
@@ -94,7 +94,7 @@ export default function RegisterPage() {
                                 value={formData.phone}
                                 onChange={handleChange}
                                 required
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-gray-50 focus:bg-white transition-colors"
                                 placeholder="+94 77 123 4567"
                             />
                         </div>
@@ -106,7 +106,7 @@ export default function RegisterPage() {
                                 name="businessName"
                                 value={formData.businessName}
                                 onChange={handleChange}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-gray-50 focus:bg-white transition-colors"
                                 placeholder="Your Auto Shop"
                             />
                             <p className="text-xs text-gray-400 mt-1">For wholesale/mechanic accounts</p>
@@ -121,7 +121,7 @@ export default function RegisterPage() {
                                 onChange={handleChange}
                                 required
                                 minLength={8}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-gray-50 focus:bg-white transition-colors"
                                 placeholder="••••••••"
                             />
                         </div>
@@ -134,25 +134,25 @@ export default function RegisterPage() {
                                 value={formData.confirmPassword}
                                 onChange={handleChange}
                                 required
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-gray-50 focus:bg-white transition-colors"
                                 placeholder="••••••••"
                             />
                         </div>
 
                         <div className="flex items-start">
-                            <input type="checkbox" required className="w-4 h-4 mt-1 text-[#C8102E] border-gray-300 rounded" />
+                            <input type="checkbox" required className="w-4 h-4 mt-1 text-red-600 border-gray-300 rounded focus:ring-red-500" />
                             <span className="ml-2 text-sm text-gray-600">
                                 I agree to the{' '}
-                                <Link href={`/${storeSlug}/terms`} className="text-[#C8102E] hover:underline">Terms & Conditions</Link>
+                                <Link href={`/${storeSlug}/terms`} className="text-red-600 hover:underline">Terms & Conditions</Link>
                                 {' '}and{' '}
-                                <Link href={`/${storeSlug}/privacy`} className="text-[#C8102E] hover:underline">Privacy Policy</Link>
+                                <Link href={`/${storeSlug}/privacy`} className="text-red-600 hover:underline">Privacy Policy</Link>
                             </span>
                         </div>
 
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full py-3 bg-[#C8102E] text-white font-semibold rounded-lg hover:bg-[#A60D24] transition-colors disabled:bg-gray-400"
+                            className="w-full py-3 bg-gray-900 text-white font-semibold rounded-lg hover:bg-gray-800 transition-colors disabled:bg-gray-400"
                         >
                             {isLoading ? 'Creating Account...' : 'Create Account'}
                         </button>
@@ -168,12 +168,12 @@ export default function RegisterPage() {
                     {/* Login Link */}
                     <p className="text-center text-sm text-gray-600">
                         Already have an account?{' '}
-                        <Link href={`/${storeSlug}/auth/login`} className="text-[#C8102E] font-medium hover:underline">
+                        <Link href={`/${storeSlug}/auth/login`} className="text-red-600 font-medium hover:underline">
                             Sign in
                         </Link>
                     </p>
-                </div>
-            </div>
+                </Surface>
+            </Section>
         </div>
     );
 }

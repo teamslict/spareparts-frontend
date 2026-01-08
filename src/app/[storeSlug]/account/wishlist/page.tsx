@@ -7,6 +7,7 @@ import { useTenant } from '@/lib/tenant-context';
 import { useWishlist, WishlistItem } from '@/lib/wishlist-store';
 import { useCart } from '@/lib/cart-store';
 import { PLACEHOLDER_IMAGE } from '@/lib/constants';
+import { Section, Container, Grid, Surface } from '@/components/ui';
 
 export default function WishlistPage() {
     const { tenant } = useTenant();
@@ -35,7 +36,7 @@ export default function WishlistPage() {
     if (items.length === 0) {
         return (
             <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-                <div className="container-custom py-16">
+                <Section size="lg">
                     <div className="max-w-md mx-auto text-center">
                         <div className="w-24 h-24 bg-gradient-to-br from-pink-100 to-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
                             <Heart size={48} className="text-red-400" />
@@ -52,7 +53,7 @@ export default function WishlistPage() {
                             Browse Products
                         </Link>
                     </div>
-                </div>
+                </Section>
             </div>
         );
     }
@@ -61,7 +62,7 @@ export default function WishlistPage() {
         <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
             {/* Header */}
             <div className="bg-white border-b border-gray-100">
-                <div className="container-custom py-6">
+                <Section size="sm">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
                             <Link
@@ -86,16 +87,17 @@ export default function WishlistPage() {
                             Clear All
                         </button>
                     </div>
-                </div>
+                </Section>
             </div>
 
             {/* Items Grid */}
-            <div className="container-custom py-8">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <Section>
+                <Grid minWidth="280px" gap="lg">
                     {items.map((item) => (
-                        <div
+                        <Surface
                             key={item.productId}
-                            className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group"
+                            padding="none"
+                            className="overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group"
                         >
                             {/* Image */}
                             <Link href={`/${storeSlug}/products/${item.productId}`} className="block relative aspect-square bg-gray-50">
@@ -144,10 +146,10 @@ export default function WishlistPage() {
                                     Move to Cart
                                 </button>
                             </div>
-                        </div>
+                        </Surface>
                     ))}
-                </div>
-            </div>
+                </Grid>
+            </Section>
         </div>
     );
 }

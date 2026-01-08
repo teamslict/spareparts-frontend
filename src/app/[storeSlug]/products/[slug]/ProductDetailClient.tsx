@@ -11,6 +11,7 @@ import { Product } from '@/lib/api';
 import { PLACEHOLDER_IMAGE } from '@/lib/constants';
 import { AddToCartDialog } from '@/components/product/AddToCartDialog';
 import { WishlistButton } from '@/components/product/WishlistButton';
+import { Container, Section, Surface } from '@/components/ui';
 
 interface Props {
     product: Product;
@@ -63,7 +64,7 @@ export function ProductDetailClient({ product, storeSlug }: Props) {
 
             {/* Breadcrumb - Premium Style */}
             <div className="bg-white/80 backdrop-blur-md border-b border-gray-100/50 py-4 sticky top-20 z-10">
-                <div className="container-custom">
+                <Container>
                     <nav className="flex items-center gap-2 text-sm text-gray-500">
                         <Link href={`/${storeSlug}`} className="hover:text-[#C8102E] transition-colors">Home</Link>
                         <ChevronRight size={14} className="text-gray-300" />
@@ -77,10 +78,10 @@ export function ProductDetailClient({ product, storeSlug }: Props) {
                         <ChevronRight size={14} className="text-gray-300" />
                         <span className="text-gray-900 font-medium truncate max-w-[200px]">{product.name}</span>
                     </nav>
-                </div>
+                </Container>
             </div>
 
-            <div className="container-custom py-8 lg:py-12">
+            <Section>
                 <div className="flex flex-col lg:flex-row gap-12">
 
                     {/* Main Content */}
@@ -340,7 +341,7 @@ export function ProductDetailClient({ product, storeSlug }: Props) {
                         <ProductSidebar />
                     </aside>
                 </div>
-            </div>
+            </Section>
         </div>
     );
 }

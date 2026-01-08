@@ -20,7 +20,7 @@ const defaultBanners = [
         subtitle: 'Upgrade Your Ride',
         imageUrl: '',
         link: '/category/performance',
-        bgColor: '#F1F5F9', // Slightly darker white/gray
+        bgColor: '#F1F5F9',
     },
 ];
 
@@ -31,45 +31,43 @@ export function PromoBanners() {
     const banners = tenant?.promoBanners?.length ? tenant.promoBanners : defaultBanners;
 
     return (
-        <section className="py-16 md:py-24 my-12">
-            <div className="container-custom">
-                <div className="grid md:grid-cols-2 gap-6">
-                    {banners.map((banner) => {
-                        const isDark = banner.bgColor.toLowerCase() !== '#f5f5f5' && banner.bgColor.toLowerCase() !== '#ffffff';
+        <div>
+            <div className="grid md:grid-cols-2 gap-6">
+                {banners.map((banner) => {
+                    const isDark = banner.bgColor.toLowerCase() !== '#f5f5f5' && banner.bgColor.toLowerCase() !== '#ffffff';
 
-                        return (
-                            <Link
-                                key={banner.id}
-                                href={banner.link}
-                                className="relative overflow-hidden rounded-lg group min-h-[160px]"
-                                style={{ backgroundColor: banner.bgColor }}
-                            >
-                                <div className="flex items-center justify-between p-6 h-full">
-                                    {/* Content */}
-                                    <div className={isDark ? 'text-white' : 'text-gray-800'}>
-                                        <p className="text-sm mb-1 opacity-80">{banner.title}</p>
-                                        <h3 className="text-2xl font-bold">{banner.subtitle}</h3>
-                                    </div>
-
-                                    {/* Image or placeholder */}
-                                    <div className="relative w-28 h-28 md:w-32 md:h-32 transform group-hover:scale-110 transition-transform duration-300">
-                                        <Image
-                                            src={banner.imageUrl || PLACEHOLDER_IMAGE}
-                                            alt={banner.subtitle}
-                                            fill
-                                            className="object-contain"
-                                            onError={(e) => {
-                                                const target = e.target as HTMLImageElement;
-                                                target.src = PLACEHOLDER_IMAGE;
-                                            }}
-                                        />
-                                    </div>
+                    return (
+                        <Link
+                            key={banner.id}
+                            href={banner.link}
+                            className="relative overflow-hidden rounded-2xl group min-h-[180px] border border-black/5 shadow-sm hover:shadow-lg transition-shadow"
+                            style={{ backgroundColor: banner.bgColor }}
+                        >
+                            <div className="flex items-center justify-between p-6 h-full">
+                                {/* Content */}
+                                <div className={isDark ? 'text-white' : 'text-gray-800'}>
+                                    <p className="text-sm mb-1 opacity-80">{banner.title}</p>
+                                    <h3 className="text-2xl font-bold">{banner.subtitle}</h3>
                                 </div>
-                            </Link>
-                        );
-                    })}
-                </div>
+
+                                {/* Image or placeholder */}
+                                <div className="relative w-28 h-28 md:w-32 md:h-32 transform group-hover:scale-110 transition-transform duration-300">
+                                    <Image
+                                        src={banner.imageUrl || PLACEHOLDER_IMAGE}
+                                        alt={banner.subtitle}
+                                        fill
+                                        className="object-contain"
+                                        onError={(e) => {
+                                            const target = e.target as HTMLImageElement;
+                                            target.src = PLACEHOLDER_IMAGE;
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        </Link>
+                    );
+                })}
             </div>
-        </section>
+        </div>
     );
 }

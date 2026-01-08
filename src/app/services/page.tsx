@@ -1,4 +1,5 @@
 import { Wrench, Truck, CreditCard, Search, Headphones, Shield } from 'lucide-react';
+import { Section, Grid, Surface } from '@/components/ui';
 
 const services = [
     {
@@ -37,35 +38,33 @@ export default function ServicesPage() {
     return (
         <div className="bg-gray-50 min-h-screen">
             {/* Hero */}
-            <section className="bg-[#1E3A5F] text-white py-16">
-                <div className="container-custom text-center">
+            <Section className="bg-[#1E3A5F] text-white py-16">
+                <div className="text-center">
                     <h1 className="text-4xl font-bold mb-4">Our Services</h1>
                     <p className="text-lg text-gray-300 max-w-2xl mx-auto">
                         More than just parts – we offer complete solutions for your automotive needs
                     </p>
                 </div>
-            </section>
+            </Section>
 
             {/* Services Grid */}
-            <section className="py-16">
-                <div className="container-custom">
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {services.map((service, index) => (
-                            <div key={index} className="bg-white p-8 rounded-lg shadow-sm hover:shadow-md transition-shadow">
-                                <div className="w-14 h-14 bg-red-50 rounded-lg flex items-center justify-center mb-6">
-                                    <service.icon size={28} className="text-[#C8102E]" />
-                                </div>
-                                <h3 className="text-xl font-bold text-gray-800 mb-3">{service.title}</h3>
-                                <p className="text-gray-600 leading-relaxed">{service.description}</p>
+            <Section>
+                <Grid minWidth="300px" gap="lg">
+                    {services.map((service, index) => (
+                        <Surface key={index} className="hover:shadow-md transition-shadow">
+                            <div className="w-14 h-14 bg-red-50 rounded-lg flex items-center justify-center mb-6">
+                                <service.icon size={28} className="text-[#C8102E]" />
                             </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
+                            <h3 className="text-xl font-bold text-gray-800 mb-3">{service.title}</h3>
+                            <p className="text-gray-600 leading-relaxed">{service.description}</p>
+                        </Surface>
+                    ))}
+                </Grid>
+            </Section>
 
             {/* CTA */}
-            <section className="py-16 bg-[#C8102E] text-white">
-                <div className="container-custom text-center">
+            <Section className="bg-[#C8102E] text-white">
+                <div className="text-center">
                     <h2 className="text-3xl font-bold mb-4">Need Help Finding a Part?</h2>
                     <p className="text-lg mb-8 opacity-90">
                         Contact us and our team will help you find exactly what you need
@@ -77,7 +76,7 @@ export default function ServicesPage() {
                         Contact Us
                     </a>
                 </div>
-            </section>
+            </Section>
         </div>
     );
 }

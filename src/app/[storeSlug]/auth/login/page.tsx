@@ -4,8 +4,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTenant } from '@/lib/tenant-context';
-
 import { api } from '@/lib/api';
+import { Surface, Section } from '@/components/ui';
 
 export default function LoginPage() {
     const { tenant } = useTenant();
@@ -24,17 +24,10 @@ export default function LoginPage() {
 
         try {
             const data = await api.loginCustomer(storeSlug, formData);
-
-            // Store token in localStorage for now
-            // In a real production app, this should be handled by httpOnly cookies or NextAuth
             localStorage.setItem('spareparts_token', data.token);
             localStorage.setItem('spareparts_user', JSON.stringify(data.user));
-
-            console.log('Login success:', data.user.name);
-
-            // Redirect to home or account
             router.push(`/${storeSlug}`);
-            router.refresh(); // Refresh to update UI state if we had a user listener
+            router.refresh();
         } catch (error: any) {
             console.error(error);
             alert(error.message || 'Login failed');
@@ -44,12 +37,12 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
-            <div className="max-w-md w-full">
-                <div className="bg-white rounded-lg shadow-lg p-8">
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <Section className="w-full max-w-lg">
+                <Surface padding="lg">
                     {/* Header */}
                     <div className="text-center mb-8">
-                        <h1 className="text-2xl font-bold text-gray-800 mb-2">Welcome Back</h1>
+                        <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome Back</h1>
                         <p className="text-gray-500">Sign in to your {tenant?.storeName || 'store'} account</p>
                     </div>
 
@@ -62,7 +55,7 @@ export default function LoginPage() {
                                 value={formData.email}
                                 onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
                                 required
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-gray-50 focus:bg-white transition-colors"
                                 placeholder="you@example.com"
                             />
                         </div>
@@ -74,17 +67,17 @@ export default function LoginPage() {
                                 value={formData.password}
                                 onChange={(e) => setFormData((prev) => ({ ...prev, password: e.target.value }))}
                                 required
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-gray-50 focus:bg-white transition-colors"
                                 placeholder="••••••••"
                             />
                         </div>
 
                         <div className="flex items-center justify-between">
                             <label className="flex items-center">
-                                <input type="checkbox" className="w-4 h-4 text-[#C8102E] border-gray-300 rounded" />
+                                <input type="checkbox" className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500" />
                                 <span className="ml-2 text-sm text-gray-600">Remember me</span>
                             </label>
-                            <Link href={`/${storeSlug}/auth/forgot-password`} className="text-sm text-[#C8102E] hover:underline">
+                            <Link href={`/${storeSlug}/auth/forgot-password`} className="text-sm text-red-600 hover:underline font-medium">
                                 Forgot password?
                             </Link>
                         </div>
@@ -92,7 +85,7 @@ export default function LoginPage() {
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full py-3 bg-[#C8102E] text-white font-semibold rounded-lg hover:bg-[#A60D24] transition-colors disabled:bg-gray-400"
+                            className="w-full py-3 bg-gray-900 text-white font-semibold rounded-lg hover:bg-gray-800 transition-colors disabled:bg-gray-400"
                         >
                             {isLoading ? 'Signing in...' : 'Sign In'}
                         </button>
@@ -108,12 +101,12 @@ export default function LoginPage() {
                     {/* Register Link */}
                     <p className="text-center text-sm text-gray-600">
                         Don&apos;t have an account?{' '}
-                        <Link href={`/${storeSlug}/auth/register`} className="text-[#C8102E] font-medium hover:underline">
+                        <Link href={`/${storeSlug}/auth/register`} className="text-red-600 font-medium hover:underline">
                             Create one
                         </Link>
                     </p>
-                </div>
-            </div>
+                </Surface>
+            </Section>
         </div>
     );
 }

@@ -5,10 +5,11 @@ import { ProductCard } from '@/components/product/ProductCard';
 import { ProductSidebar } from '@/components/product/ProductSidebar';
 import { VehicleSelector } from '@/components/product/VehicleSelector';
 import Link from 'next/link';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Loader2 } from 'lucide-react';
 import { useTenant } from '@/lib/tenant-context';
 import { api, Product } from '@/lib/api';
 import { useSearchParams } from 'next/navigation';
+import { Section, Container, Grid, PageHeader, Surface } from '@/components/ui';
 
 export default function ProductsPage() {
     const { tenant } = useTenant();
@@ -71,35 +72,40 @@ export default function ProductsPage() {
     return (
         <div className="bg-gray-50 min-h-screen">
             {/* Breadcrumb */}
-            <div className="bg-white border-b py-3">
-                <div className="container-custom">
+            <div className="bg-white border-b">
+                <Container className="py-3">
                     <nav className="flex items-center gap-2 text-sm">
-                        <Link href={`/${storeSlug}`} className="text-gray-500 hover:text-[#C8102E]">HOME</Link>
+                        <Link href={`/${storeSlug}`} className="text-gray-500 hover:text-red-600 transition-colors">
+                            Home
+                        </Link>
                         <ChevronRight size={14} className="text-gray-400" />
-                        <span className="text-gray-800 font-medium">ALL PRODUCTS</span>
+                        <span className="text-gray-900 font-medium">All Products</span>
                     </nav>
-                </div>
+                </Container>
             </div>
 
-            <div className="container-custom py-8">
+            {/* Main Content */}
+            <Section>
                 <div className="flex flex-col lg:flex-row gap-8">
                     {/* Sidebar */}
                     <aside className="lg:w-64 flex-shrink-0">
-                        <ProductSidebar />
+                        <Surface padding="md" className="sticky top-24">
+                            <ProductSidebar />
+                        </Surface>
                     </aside>
 
-                    {/* Main Content */}
-                    <main className="flex-1">
-                        {/* Header with Vehicle Filter */}
+                    {/* Products Area */}
+                    <main className="flex-1 min-w-0">
+                        {/* Header Row */}
                         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
                             <div className="flex items-center gap-4">
-                                <h1 className="text-2xl font-bold text-gray-800">All Products</h1>
+                                <h1 className="text-2xl font-bold text-gray-900">All Products</h1>
                                 <VehicleSelector onSelect={handleVehicleSelect} />
                             </div>
 
                             <div className="flex items-center gap-4">
                                 <span className="text-sm text-gray-500">{totalProducts} products</span>
-                                <select className="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <select className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
                                     <option>Sort by: Latest</option>
                                     <option>Price: Low to High</option>
                                     <option>Price: High to Low</option>
@@ -108,34 +114,41 @@ export default function ProductsPage() {
                             </div>
                         </div>
 
-                        {/* Active Filters */}
+                        {/* Active Vehicle Filter */}
                         {(filters.make || filters.model || filters.year) && (
-                            <div className="mb-4 p-3 bg-red-50 rounded-lg flex items-center gap-2">
+                            <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl flex items-center justify-between">
                                 <span className="text-sm text-red-700">
-                                    Showing parts compatible with: <strong>{[filters.make, filters.model, filters.year].filter(Boolean).join(' ')}</strong>
+                                    Showing parts for: <strong>{[filters.make, filters.model, filters.year].filter(Boolean).join(' ')}</strong>
                                 </span>
                                 <button
                                     onClick={() => handleVehicleSelect({})}
-                                    className="text-red-600 text-sm underline ml-2"
+                                    className="text-red-600 text-sm font-medium hover:underline"
                                 >
-                                    Clear
+                                    Clear filter
                                 </button>
                             </div>
                         )}
 
                         {/* Loading State */}
                         {loading ? (
-                            <div className="flex justify-center py-12">
-                                <div className="w-10 h-10 border-4 border-gray-200 border-t-red-600 rounded-full animate-spin"></div>
+                            <div className="flex items-center justify-center py-24">
+                                <Loader2 size={32} className="text-gray-400 animate-spin" />
                             </div>
                         ) : products.length === 0 ? (
-                            <div className="text-center py-12">
-                                <p className="text-gray-500">No products found matching your criteria.</p>
-                            </div>
+                            /* Empty State */
+                            <Surface padding="lg" className="text-center">
+                                <p className="text-gray-500 mb-4">No products found matching your criteria.</p>
+                                <button
+                                    onClick={() => setFilters({ category: '', brand: '', make: '', model: '', year: '' })}
+                                    className="text-red-600 font-medium hover:underline"
+                                >
+                                    Clear all filters
+                                </button>
+                            </Surface>
                         ) : (
                             <>
                                 {/* Products Grid */}
-                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                <Grid minWidth="240px" gap="md">
                                     {products.map((product) => (
                                         <ProductCard
                                             key={product.id}
@@ -147,10 +160,10 @@ export default function ProductsPage() {
                                             category={product.category}
                                             stockStatus={product.stockQty > 0 ? 'IN_STOCK' : 'OUT_OF_STOCK'}
                                             slug={product.id}
-                                            matchedAlias={(product as any).matchedAlias} // Pass matched alias from API
+                                            matchedAlias={(product as any).matchedAlias}
                                         />
                                     ))}
-                                </div>
+                                </Grid>
 
                                 {/* Pagination */}
                                 {totalPages > 1 && (
@@ -158,7 +171,7 @@ export default function ProductsPage() {
                                         <button
                                             onClick={() => setPage(p => Math.max(1, p - 1))}
                                             disabled={page === 1}
-                                            className="w-10 h-10 border border-gray-300 rounded flex items-center justify-center hover:bg-gray-100 disabled:opacity-50"
+                                            className="w-10 h-10 border border-gray-200 rounded-lg flex items-center justify-center hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                                         >
                                             &lt;
                                         </button>
@@ -166,7 +179,9 @@ export default function ProductsPage() {
                                             <button
                                                 key={p}
                                                 onClick={() => setPage(p)}
-                                                className={`w-10 h-10 rounded flex items-center justify-center ${page === p ? 'bg-[#C8102E] text-white' : 'border border-gray-300 hover:bg-gray-100'
+                                                className={`w-10 h-10 rounded-lg flex items-center justify-center font-medium transition-colors ${page === p
+                                                    ? 'bg-gray-900 text-white'
+                                                    : 'border border-gray-200 hover:bg-gray-50'
                                                     }`}
                                             >
                                                 {p}
@@ -175,7 +190,7 @@ export default function ProductsPage() {
                                         <button
                                             onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                                             disabled={page === totalPages}
-                                            className="w-10 h-10 border border-gray-300 rounded flex items-center justify-center hover:bg-gray-100 disabled:opacity-50"
+                                            className="w-10 h-10 border border-gray-200 rounded-lg flex items-center justify-center hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                                         >
                                             &gt;
                                         </button>
@@ -185,7 +200,7 @@ export default function ProductsPage() {
                         )}
                     </main>
                 </div>
-            </div>
+            </Section>
         </div>
     );
 }

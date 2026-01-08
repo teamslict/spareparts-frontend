@@ -1,23 +1,22 @@
 "use client";
 
 import { useTenant } from '@/lib/tenant-context';
+import { Section, Surface } from '@/components/ui';
 
 export default function PrivacyPage() {
     const { tenant } = useTenant();
     const storeName = tenant?.storeName || 'Slict';
 
     return (
-        <div className="bg-slate-50 min-h-screen pb-20">
-            <section className="bg-slate-900 text-white py-16">
-                <div className="max-w-4xl mx-auto px-6 text-center">
-                    <h1 className="text-3xl md:text-4xl font-bold mb-4">Privacy Policy</h1>
-                    <p className="text-slate-400">Values that drive us to protect you.</p>
-                </div>
-            </section>
+        <div className="bg-slate-50 min-h-screen">
+            <Section className="bg-gray-900 text-white text-center">
+                <h1 className="text-3xl md:text-4xl font-bold mb-4">Privacy Policy</h1>
+                <p className="text-slate-400">Values that drive us to protect you.</p>
+            </Section>
 
-            <div className="max-w-4xl mx-auto px-6 -mt-8">
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 md:p-12 prose prose-slate max-w-none">
-                    <h2 className="text-slate-900">1. Information We Collect</h2>
+            <Section>
+                <Surface padding="lg" className="prose prose-slate max-w-none">
+                    <h2 className="text-slate-900 mt-0">1. Information We Collect</h2>
                     <p>
                         When you visit {storeName}, we collect certain information about your device, your interaction with the Site, and information necessary to process your purchases. We may also collect additional information if you contact us for customer support.
                     </p>
@@ -46,8 +45,8 @@ export default function PrivacyPage() {
                     <p>
                         For more information about our privacy practices, if you have questions, or if you would like to make a complaint, please contact us by e-mail at {tenant?.contactEmail || 'sales@slict.lk'}.
                     </p>
-                </div>
-            </div>
+                </Surface>
+            </Section>
         </div>
     );
 }

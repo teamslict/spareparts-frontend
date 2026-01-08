@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from 'react';
-import { Search, Package, MapPin, Calendar, CheckCircle } from 'lucide-react';
+import { Search, Package, CheckCircle } from 'lucide-react';
+import { Section, Surface } from '@/components/ui';
 
 export default function TrackOrderPage() {
     const [orderId, setOrderId] = useState('');
@@ -24,9 +25,9 @@ export default function TrackOrderPage() {
     };
 
     return (
-        <div className="bg-slate-50 min-h-screen pb-20">
-            <section className="bg-slate-900 text-white py-20">
-                <div className="max-w-3xl mx-auto px-6 text-center">
+        <div className="bg-slate-50 min-h-screen">
+            <Section className="bg-slate-900 text-white text-center">
+                <div className="max-w-2xl mx-auto">
                     <h1 className="text-3xl md:text-5xl font-bold mb-6">Track Your Order</h1>
                     <p className="text-xl text-slate-300 mb-8">
                         Enter your order number to check the latest status.
@@ -46,12 +47,12 @@ export default function TrackOrderPage() {
                         </button>
                     </form>
                 </div>
-            </section>
+            </Section>
 
-            {status && (
-                <div className="max-w-3xl mx-auto px-6 -mt-10">
-                    <div className="bg-white rounded-2xl shadow-xl border border-slate-100 p-8">
-                        <div className="flex items-center justify-between mb-8 pb-8 border-b border-slate-100">
+            <Section>
+                {status && (
+                    <Surface padding="lg" className="max-w-3xl mx-auto">
+                        <div className="flex items-center justify-between mb-8 pb-8 border-b border-gray-100">
                             <div>
                                 <p className="text-sm text-slate-500 uppercase tracking-wider font-bold">Order ID</p>
                                 <p className="text-2xl font-bold text-slate-900">{status.id}</p>
@@ -80,16 +81,16 @@ export default function TrackOrderPage() {
                                 </div>
                             ))}
                         </div>
-                    </div>
-                </div>
-            )}
+                    </Surface>
+                )}
 
-            {!status && (
-                <div className="max-w-3xl mx-auto px-6 mt-12 text-center text-slate-500">
-                    <Package size={48} className="mx-auto text-slate-300 mb-4" />
-                    <p>Enter your order ID above to see tracking details.</p>
-                </div>
-            )}
+                {!status && (
+                    <div className="text-center text-slate-500 mt-8">
+                        <Package size={48} className="mx-auto text-slate-300 mb-4" />
+                        <p>Enter your order ID above to see tracking details.</p>
+                    </div>
+                )}
+            </Section>
         </div>
     );
 }

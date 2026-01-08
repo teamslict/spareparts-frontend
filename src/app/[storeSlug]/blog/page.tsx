@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Calendar, Clock, ArrowRight, Tag, User } from 'lucide-react';
+import { Calendar, Clock, ArrowRight, Tag } from 'lucide-react';
 import { useTenant } from '@/lib/tenant-context';
+import { Section, Container, Surface, Grid } from '@/components/ui';
 
 // Demo blog posts (would be fetched from API in production)
 const demoPosts = [
@@ -58,7 +59,7 @@ export default function BlogPage() {
             {/* Hero */}
             <div className="relative bg-gradient-to-r from-gray-900 to-gray-800 text-white py-16 overflow-hidden">
                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&q=80')] bg-cover bg-center opacity-20"></div>
-                <div className="container-custom relative z-10">
+                <Container className="relative z-10">
                     <div className="max-w-2xl">
                         <span className="inline-block px-3 py-1 bg-[#C8102E] text-white text-xs font-bold rounded-full uppercase tracking-wider mb-4">
                             Blog
@@ -70,10 +71,10 @@ export default function BlogPage() {
                             Expert advice, maintenance tips, and product reviews to keep your vehicle running smoothly.
                         </p>
                     </div>
-                </div>
+                </Container>
             </div>
 
-            <div className="container-custom py-12">
+            <Section>
                 <div className="flex flex-col lg:flex-row gap-12">
                     {/* Main Content */}
                     <main className="flex-1">
@@ -111,7 +112,7 @@ export default function BlogPage() {
                         <div className="grid md:grid-cols-2 gap-8">
                             {demoPosts.slice(1).map((post) => (
                                 <Link key={post.id} href={`/${storeSlug}/blog/${post.slug}`} className="group">
-                                    <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300">
+                                    <Surface padding="none" className="overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300">
                                         <div className="relative aspect-video overflow-hidden">
                                             <Image
                                                 src={post.image}
@@ -144,7 +145,7 @@ export default function BlogPage() {
                                                 </span>
                                             </div>
                                         </div>
-                                    </div>
+                                    </Surface>
                                 </Link>
                             ))}
                         </div>
@@ -153,7 +154,7 @@ export default function BlogPage() {
                     {/* Sidebar */}
                     <aside className="lg:w-80 space-y-8">
                         {/* Categories */}
-                        <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+                        <Surface padding="md">
                             <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
                                 <Tag size={18} className="text-[#C8102E]" />
                                 Categories
@@ -170,7 +171,7 @@ export default function BlogPage() {
                                     </Link>
                                 ))}
                             </div>
-                        </div>
+                        </Surface>
 
                         {/* Newsletter Signup */}
                         <div className="bg-gradient-to-br from-[#C8102E] to-[#991b1b] rounded-2xl p-6 text-white">
@@ -189,7 +190,7 @@ export default function BlogPage() {
                         </div>
                     </aside>
                 </div>
-            </div>
+            </Section>
         </div>
     );
 }

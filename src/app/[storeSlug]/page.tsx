@@ -6,8 +6,10 @@ import { BrandCategories } from '@/components/home/BrandCategories';
 import { CategorySection } from '@/components/home/CategorySection';
 import { CategoryGrid } from '@/components/home/CategoryGrid';
 import { PromoBanners } from '@/components/home/PromoBanners';
+import { Section } from '@/components/ui/Section';
+import { Container } from '@/components/ui/Container';
 
-// Demo products with empty images to use fallback SVGs
+// Demo products
 const engineParts = [
   { id: 'e1', name: 'CHERY QQ ENGINE VALVE INLET', sku: 'CHE-100', price: null, image: '', stockStatus: 'IN_STOCK' as const, rating: 5, slug: 'chery-qq-engine-valve-inlet' },
   { id: 'e2', name: 'CHERY QQ ENGINE VALVE EXHAUST', sku: 'CHE-101', price: null, image: '', stockStatus: 'IN_STOCK' as const, rating: 5, slug: 'chery-qq-engine-valve-exhaust' },
@@ -22,62 +24,68 @@ const filterParts = [
   { id: 'f4', name: 'OIL FILTER UNIVERSAL', sku: 'UNI-203', price: null, image: '', stockStatus: 'IN_STOCK' as const, rating: 5, slug: 'oil-filter-universal' },
 ];
 
-export default function HomePage({ params }: { params?: { storeSlug: string } }) {
+export default function HomePage() {
   return (
-    <div className="flex flex-col gap-10 pb-12 bg-slate-50 min-h-screen text-slate-900">
-      {/* Hero Section with Categories Sidebar */}
-      <section className="pt-6 pb-2">
-        <div className="container-custom">
-          <div className="flex flex-col lg:flex-row gap-6">
-            {/* Categories Sidebar - Hidden on mobile, visible on lg */}
+    <div className="flex flex-col min-h-screen bg-slate-50 text-slate-900">
+
+      {/* Hero Section */}
+      <section className="pt-6 pb-6">
+        <Container>
+          <div className="flex flex-col lg:flex-row gap-6 items-stretch">
+            {/* Categories Sidebar */}
             <div className="hidden lg:block lg:w-72 flex-shrink-0">
               <CategorySidebar />
             </div>
 
-            {/* Hero Slider - Takes remaining width */}
+            {/* Hero Slider */}
             <div className="flex-1 min-w-0">
               <HeroSlider />
             </div>
           </div>
-        </div>
+        </Container>
       </section>
 
       {/* Benefits Bar */}
-      <BenefitsBar />
+      <Section variant="narrow" className="border-y border-gray-200 bg-white">
+        <BenefitsBar />
+      </Section>
 
       {/* Visual Category Grid */}
-      <CategoryGrid />
+      <Section>
+        <CategoryGrid />
+      </Section>
 
       {/* Products Section */}
-      <ProductsSection />
+      <Section className="bg-white">
+        <ProductsSection />
+      </Section>
 
       {/* Brand Categories */}
-      <BrandCategories />
+      <Section className="bg-white">
+        <BrandCategories />
+      </Section>
 
-      {/* Vertical Stack for Category Sections */}
-      <div className="flex flex-col gap-8">
-        {/* Engine Parts */}
+      {/* Category Sections */}
+      <Section className="bg-white">
         <CategorySection
           title="Engine Parts"
           highlightWord="Parts"
           products={engineParts}
         />
+      </Section>
 
-        {/* Filter Parts */}
+      <Section>
         <CategorySection
           title="Filter Parts"
           highlightWord="Parts"
           products={filterParts}
         />
-      </div>
+      </Section>
 
       {/* Promo Banners */}
-      <div>
+      <Section variant="narrow">
         <PromoBanners />
-      </div>
-
-      {/* Explicit Footer Spacer */}
-      <div className="h-24 w-full" aria-hidden="true" />
+      </Section>
     </div>
   );
 }

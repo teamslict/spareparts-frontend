@@ -72,12 +72,7 @@ body {
   background: var(--gray-500);
 }
 
-/* Utility Classes */
-.container-custom {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 1rem;
-}
+
 
 /* Button Styles */
 .btn-primary {

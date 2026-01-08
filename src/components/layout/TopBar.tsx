@@ -3,12 +3,14 @@
 import { useTenant } from '@/lib/tenant-context';
 import { Phone, Mail, MessageCircle } from 'lucide-react';
 
+import { Container } from '@/components/ui';
+
 export function TopBar() {
     const { tenant } = useTenant();
 
     return (
         <div style={{ backgroundColor: tenant?.secondaryColor || '#1E3A5F' }} className="text-white text-sm py-2">
-            <div className="container-custom flex flex-wrap items-center justify-between gap-2">
+            <Container className="flex flex-wrap items-center justify-between gap-2">
                 {/* Left side - Contact info (from tenant config) */}
                 <div className="flex flex-wrap items-center gap-4">
                     {/* Phone */}
@@ -81,7 +83,7 @@ export function TopBar() {
                         </a>
                     )}
                 </div>
-            </div>
+            </Container>
         </div>
     );
 }
