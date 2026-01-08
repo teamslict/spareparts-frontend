@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import "@/polyfills/ssr-location";
 
 const inter = Inter({
     variable: "--font-inter",
