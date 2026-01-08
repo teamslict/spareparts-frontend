@@ -121,9 +121,9 @@ export function Header() {
                 <div className="flex items-center gap-3 md:gap-5">
 
                     {/* Account */}
-                    <Link href={getLink('/auth/login')} className="hidden sm:flex items-center gap-2 group p-2 rounded-full hover:bg-gray-50 transition-colors">
+                    <Link href={getLink('/account')} className="hidden sm:flex items-center gap-2 group p-2 rounded-full hover:bg-gray-50 transition-colors">
                         <User size={20} className="text-gray-700 group-hover:text-red-600 transition-colors" />
-                        <span className="text-xs font-medium text-gray-600 group-hover:text-red-600 hidden xl:block">Sign In</span>
+                        <span className="text-xs font-medium text-gray-600 group-hover:text-red-600 hidden xl:block">Account</span>
                     </Link>
 
                     {/* Cart */}
