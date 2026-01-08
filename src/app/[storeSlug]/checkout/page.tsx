@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useTenant } from '@/lib/tenant-context';
 import { useCart } from '@/lib/cart-store';
 import { api } from '@/lib/api';
+import { getErrorMessage } from '@/lib/error-utils';
 
 export default function CheckoutPage() {
     const { tenant } = useTenant();
@@ -15,6 +16,12 @@ export default function CheckoutPage() {
 
     const items = cart.getItems(storeSlug);
     const subtotal = cart.getTotal(storeSlug);
+
+    // Robust tax calculation handling potential string conversion and 0 values
+    const rawTax = Number(tenant?.taxRate);
+    const taxRate = rawTax > 0 ? rawTax : 18; // Default to 18% if 0 or undefined
+    const taxAmount = subtotal * (taxRate / 100);
+    const total = subtotal + taxAmount;
 
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
@@ -47,7 +54,12 @@ export default function CheckoutPage() {
                 items: items.map(item => ({
                     productId: item.productId,
                     quantity: item.quantity
-                }))
+                })),
+                subtotal,
+                taxAmount,
+                taxRate,
+                total,
+                shippingAmount: 0 // Free shipping per logic
             };
 
             const result = await api.createOrder(storeSlug, orderData);
@@ -58,9 +70,9 @@ export default function CheckoutPage() {
             // Redirect to success page
             router.push(`/${storeSlug}/checkout/success?order=${result.invoiceNumber}`);
 
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error(err);
-            setError(err.message || 'Checkout failed. Please try again.');
+            setError(getErrorMessage(err));
         } finally {
             setIsLoading(false);
         }
@@ -158,7 +170,7 @@ export default function CheckoutPage() {
                             disabled={isLoading}
                             className="w-full py-4 bg-[#C8102E] text-white font-semibold rounded-lg hover:bg-[#A60D24] transition-colors disabled:bg-gray-400"
                         >
-                            {isLoading ? 'Processing...' : `Place Order - LKR ${subtotal.toLocaleString()}`}
+                            {isLoading ? 'Processing...' : `Place Order - LKR ${total.toLocaleString(undefined, { maximumFractionDigits: 2 })}`}
                         </button>
                     </form>
                 </div>
@@ -193,13 +205,19 @@ export default function CheckoutPage() {
                             <span>Subtotal</span>
                             <span>LKR {subtotal.toLocaleString()}</span>
                         </div>
+                        {taxAmount > 0 && (
+                            <div className="flex justify-between text-sm">
+                                <span>Tax ({taxRate}%)</span>
+                                <span>LKR {taxAmount.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+                            </div>
+                        )}
                         <div className="flex justify-between text-sm">
                             <span>Shipping</span>
                             <span className="text-green-600">Free</span>
                         </div>
                         <div className="flex justify-between font-bold text-lg border-t pt-2">
                             <span>Total</span>
-                            <span>LKR {subtotal.toLocaleString()}</span>
+                            <span>LKR {total.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
                         </div>
                     </div>
                 </div>

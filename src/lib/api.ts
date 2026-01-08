@@ -33,6 +33,8 @@ export interface Category {
 export interface Brand {
     name: string;
     count: number;
+    slug: string;
+    logoUrl?: string; // Optional as not all brands might have logos
 }
 
 interface ProductResponse {
@@ -57,13 +59,16 @@ export const api = {
         model?: string;
         year?: string;
         page?: number;
+
         limit?: number;
+        sort?: string;
     } = {}): Promise<ProductResponse> => {
         try {
             const query = new URLSearchParams({
                 subdomain: storeSlug,
                 page: (params.page || 1).toString(),
-                limit: (params.limit || 20).toString()
+                limit: (params.limit || 20).toString(),
+                sort: params.sort || 'latest'
             });
 
             if (params.category && params.category !== 'All') query.append('category', params.category);
@@ -138,7 +143,7 @@ export const api = {
     /**
      * Customer Authentication
      */
-    registerCustomer: async (storeSlug: string, data: any) => {
+    registerCustomer: async (storeSlug: string, data: Record<string, unknown>) => {
         const res = await fetch(`${API_URL}/api/public/spareparts/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -152,7 +157,7 @@ export const api = {
         return await res.json();
     },
 
-    loginCustomer: async (storeSlug: string, data: any) => {
+    loginCustomer: async (storeSlug: string, data: Record<string, unknown>) => {
         const res = await fetch(`${API_URL}/api/public/spareparts/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -190,5 +195,180 @@ export const api = {
             throw new Error('Checkout failed');
         }
         return await res.json();
+    },
+
+    /**
+     * Get Customer Orders
+     */
+    getOrders: async (storeSlug: string, token: string) => {
+        const res = await fetch(`${API_URL}/api/public/spareparts/orders`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!res.ok) throw new Error('Failed to fetch orders');
+        return await res.json();
+    },
+
+    /**
+     * Get Single Order Details
+     */
+    getOrder: async (storeSlug: string, orderId: string, token: string) => {
+        const res = await fetch(`${API_URL}/api/public/spareparts/orders/${orderId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!res.ok) throw new Error('Failed to fetch order details');
+        return await res.json();
+    },
+
+    /**
+     * Track Order (Public)
+     */
+    trackOrder: async (storeSlug: string, orderId: string) => {
+        const res = await fetch(`${API_URL}/api/public/spareparts/tracking/${orderId}?subdomain=${storeSlug}`, {
+            next: { revalidate: 0 }
+        });
+
+        if (!res.ok) throw new Error('Failed to track order');
+        return await res.json();
+    },
+
+    /**
+     * Addresses
+     */
+    getAddresses: async (storeSlug: string, token: string) => {
+        const res = await fetch(`${API_URL}/api/public/spareparts/addresses`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error('Failed to fetch addresses');
+        return await res.json();
+    },
+
+    addAddress: async (storeSlug: string, token: string, data: Record<string, unknown>) => {
+        const res = await fetch(`${API_URL}/api/public/spareparts/addresses`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ ...data, subdomain: storeSlug })
+        });
+        if (!res.ok) {
+            const errorText = await res.text();
+            throw new Error(errorText || 'Failed to add address');
+        }
+        return await res.json();
+    },
+
+    // Subscription & Profile
+    getProfile: async (storeSlug: string, token: string) => {
+        const res = await fetch(`${API_URL}/api/public/spareparts/profile`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error('Failed to fetch profile');
+        return await res.json();
+    },
+
+    getPlans: async (storeSlug: string) => {
+        const res = await fetch(`${API_URL}/api/public/spareparts/subscription/plans`);
+        if (!res.ok) throw new Error('Failed to fetch plans');
+        return await res.json();
+    },
+
+    upgradeSubscription: async (storeSlug: string, token: string, planId: string) => {
+        const res = await fetch(`${API_URL}/api/public/spareparts/subscription/upgrade`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ planId, subdomain: storeSlug })
+        });
+        if (!res.ok) throw new Error('Failed to upgrade');
+        return await res.json();
+    },
+
+    /**
+     * Vehicles
+     */
+    getVehicles: async (storeSlug: string, token: string) => {
+        const res = await fetch(`${API_URL}/api/public/spareparts/vehicles`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error('Failed to fetch vehicles');
+        return await res.json();
+    },
+
+    addVehicle: async (storeSlug: string, token: string, data: Record<string, unknown>) => {
+        const res = await fetch(`${API_URL}/api/public/spareparts/vehicles`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ ...data, subdomain: storeSlug })
+        });
+        if (!res.ok) {
+            const errorText = await res.text();
+            throw new Error(errorText || 'Failed to add vehicle');
+        }
+        return await res.json();
+    },
+
+    /**
+     * Profile & Settings
+     */
+    updateProfile: async (storeSlug: string, token: string, data: Record<string, unknown>) => {
+        const res = await fetch(`${API_URL}/api/public/spareparts/profile`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ ...data, subdomain: storeSlug })
+        });
+        if (!res.ok) throw new Error('Failed to update profile');
+        return await res.json();
+    },
+
+    changePassword: async (storeSlug: string, token: string, data: Record<string, unknown>) => {
+        const res = await fetch(`${API_URL}/api/public/spareparts/auth/change-password`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ ...data, subdomain: storeSlug })
+        });
+
+        if (!res.ok) {
+            const json = await res.json().catch(() => null);
+            throw new Error(json?.error || 'Failed to change password');
+        }
+        return await res.json();
     }
 };
+
+export interface Address {
+    id: string;
+    type: string;
+    name?: string;
+    address: string;
+    city: string;
+    postalCode?: string;
+    phone?: string;
+    isDefault: boolean;
+}
+
+export interface Vehicle {
+    id: string;
+    make: string;
+    model: string;
+    year: number;
+    plateNumber?: string;
+    vin?: string;
+}

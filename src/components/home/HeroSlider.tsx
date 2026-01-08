@@ -9,6 +9,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 
 import { PLACEHOLDER_IMAGE } from '@/lib/constants';
+import { resolveImageUrl } from '@/lib/utils';
 
 // Fallback placeholder for missing hero images
 const HERO_PLACEHOLDER = PLACEHOLDER_IMAGE;
@@ -50,7 +51,7 @@ export function HeroSlider() {
 
     useEffect(() => {
         if (!emblaApi) return;
-        onSelect();
+
         emblaApi.on('select', onSelect);
 
         // Auto-play
@@ -143,7 +144,7 @@ export function HeroSlider() {
                                     >
                                         {slide.imageUrl ? (
                                             <Image
-                                                src={slide.imageUrl}
+                                                src={resolveImageUrl(slide.imageUrl)}
                                                 alt={slide.subtitle}
                                                 fill
                                                 className="object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.3)]"

@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { useTenant } from '@/lib/tenant-context';
 import { ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { resolveImageUrl } from '@/lib/utils';
+import type { FeaturedCategory } from '@/types/tenant';
 
 export function CategoryGrid() {
     const { tenant } = useTenant();
@@ -39,7 +41,7 @@ export function CategoryGrid() {
                     }}
                     className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6"
                 >
-                    {categories.map((cat: any) => (
+                    {categories.map((cat: FeaturedCategory) => (
                         <motion.div
                             key={cat.id || cat.slug}
                             variants={{
@@ -59,7 +61,7 @@ export function CategoryGrid() {
 
                                     {cat.imageUrl ? (
                                         <Image
-                                            src={cat.imageUrl}
+                                            src={resolveImageUrl(cat.imageUrl)}
                                             alt={cat.name}
                                             fill
                                             className="object-contain p-2 drop-shadow-md brightness-110"

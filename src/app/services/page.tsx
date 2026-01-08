@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Wrench, Truck, CreditCard, Search, Headphones, Shield } from 'lucide-react';
 
 const services = [
@@ -70,12 +71,12 @@ export default function ServicesPage() {
                     <p className="text-lg mb-8 opacity-90">
                         Contact us and our team will help you find exactly what you need
                     </p>
-                    <a
+                    <Link
                         href="/contact"
                         className="inline-block px-8 py-3 bg-white text-[#C8102E] font-semibold rounded hover:bg-gray-100 transition-colors"
                     >
                         Contact Us
-                    </a>
+                    </Link>
                 </div>
             </section>
         </div>

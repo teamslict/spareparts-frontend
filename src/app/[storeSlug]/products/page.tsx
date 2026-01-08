@@ -147,7 +147,7 @@ export default function ProductsPage() {
                                             category={product.category}
                                             stockStatus={product.stockQty > 0 ? 'IN_STOCK' : 'OUT_OF_STOCK'}
                                             slug={product.id}
-                                            matchedAlias={(product as any).matchedAlias} // Pass matched alias from API
+                                            matchedAlias={(product as typeof product & { matchedAlias?: string }).matchedAlias} // Pass matched alias from API
                                         />
                                     ))}
                                 </div>

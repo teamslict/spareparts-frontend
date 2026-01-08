@@ -2,14 +2,16 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Search, ShoppingCart, User, Menu, ChevronDown, Phone, X } from 'lucide-react';
+import { Search, ShoppingCart, User, Menu, ChevronDown, Phone, X, Heart } from 'lucide-react';
 import { useTenant } from '@/lib/tenant-context';
 import { useCart } from '@/lib/cart-store';
+import { useWishlist } from '@/lib/wishlist-store';
 import { useState, useEffect } from 'react';
 
 export function Header() {
     const { tenant } = useTenant();
-    const { getItemCount } = useCart();
+    const { getItemCount: getCartCount } = useCart();
+    const { getItemCount: getWishlistCount } = useWishlist();
     const [searchQuery, setSearchQuery] = useState('');
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -120,6 +122,17 @@ export function Header() {
                 {/* 4. Utilities (Cart, Account, Mobile Menu) */}
                 <div className="flex items-center gap-3 md:gap-5">
 
+                    {/* Wishlist */}
+                    <Link href={getLink('/account/wishlist')} className="hidden sm:flex items-center gap-2 group p-2 rounded-full hover:bg-gray-50 transition-colors relative">
+                        <Heart size={20} className="text-gray-700 group-hover:text-red-600 transition-colors" />
+                        <span className="text-xs font-medium text-gray-600 group-hover:text-red-600 hidden xl:block">Saved</span>
+                        {getWishlistCount(tenant?.subdomain || 'demo') > 0 && (
+                            <span className="absolute top-0 right-0 w-4 h-4 bg-red-600 text-white text-[10px] font-bold flex items-center justify-center rounded-full animate-bounce-short">
+                                {getWishlistCount(tenant?.subdomain || 'demo')}
+                            </span>
+                        )}
+                    </Link>
+
                     {/* Account */}
                     <Link href={getLink('/account')} className="hidden sm:flex items-center gap-2 group p-2 rounded-full hover:bg-gray-50 transition-colors">
                         <User size={20} className="text-gray-700 group-hover:text-red-600 transition-colors" />
@@ -129,9 +142,9 @@ export function Header() {
                     {/* Cart */}
                     <Link href={getLink('/cart')} className="relative p-2 rounded-full hover:bg-gray-50 transition-colors group">
                         <ShoppingCart size={22} className="text-gray-700 group-hover:text-red-600 transition-colors" />
-                        {getItemCount(tenant?.subdomain || 'demo') > 0 && (
+                        {getCartCount(tenant?.subdomain || 'demo') > 0 && (
                             <span className="absolute top-0 right-0 w-4 h-4 bg-red-600 text-white text-[10px] font-bold flex items-center justify-center rounded-full animate-bounce-short">
-                                {getItemCount(tenant?.subdomain || 'demo')}
+                                {getCartCount(tenant?.subdomain || 'demo')}
                             </span>
                         )}
                     </Link>

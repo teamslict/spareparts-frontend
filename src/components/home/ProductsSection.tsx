@@ -28,15 +28,10 @@ export function ProductsSection() {
 
             setLoading(true);
             try {
-                // Determine category filter based on tab
-                // In real scenario, tabs could map to specific categories or "featured" flags
-                const category = activeTab === 'bestsellers' ? 'featured' : undefined; // Simplified logic
-
                 const { api } = await import('@/lib/api');
                 const res = await api.getProducts(tenant.subdomain, {
                     limit: 10,
-                    // For now, we just fetch latest products for all tabs, 
-                    // but in future backend should support 'sort' or 'featured' flags
+                    sort: activeTab // Pass 'latest', 'popular', or 'bestsellers' directly
                 });
 
                 const mapped: ProductCardProps[] = res.data.map(p => ({
@@ -82,8 +77,8 @@ export function ProductsSection() {
             <div className="container-custom">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-10">
-                    <h2 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
-                        Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Products</span>
+                    <h2 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight">
+                        Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">Products</span>
                     </h2>
 
                     {/* Tabs */}

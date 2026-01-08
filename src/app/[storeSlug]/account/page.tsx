@@ -1,34 +1,70 @@
 "use client";
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Package, CreditCard, Car, User, ChevronRight, Settings, LogOut, Heart, MapPin, Bell } from 'lucide-react';
+import { Package, CreditCard, Car, User as UserIcon, ChevronRight, Settings, LogOut, Heart, MapPin, Bell } from 'lucide-react';
 import { useTenant } from '@/lib/tenant-context';
 import { useRouter } from 'next/navigation';
+import { api } from '@/lib/api';
+import type { User, Order } from '@/types/models';
 
 export default function AccountPage() {
     const { tenant } = useTenant();
     const router = useRouter();
     const storeSlug = tenant?.subdomain || 'demo';
 
-    // Mock User Data (Replace with real auth later)
-    const user = {
-        name: "Alex Fernando",
-        email: "alex@example.com",
-        tier: "Gold Member",
-        avatar: "https://ui-avatars.com/api/?name=Alex+Fernando&background=random"
-    };
+    const [user, setUser] = useState<User | null>(null);
+    const [recentOrders, setRecentOrders] = useState<Order[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    // Mock Recent Orders
-    const recentOrders = [
-        { id: 'ORD-8392', date: 'Oct 24, 2025', total: 45000, status: 'Delivered', items: 4, image: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&q=80&w=200" },
-        { id: 'ORD-8391', date: 'Oct 10, 2025', total: 12500, status: 'Processing', items: 2, image: "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&q=80&w=200" },
-    ];
+    const [vehiclesCount, setVehiclesCount] = useState(0);
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem('spareparts_user');
+        const token = localStorage.getItem('spareparts_token');
+
+        if (!storedUser || !token) {
+            router.push(`/${storeSlug}/auth/login`);
+            return;
+        }
+
+        // Use async IIFE to avoid synchronous setState
+        (async () => {
+            const initialUser = JSON.parse(storedUser);
+
+            try {
+                // Fetch latest profile to get tier
+                const data = await api.getProfile(storeSlug, token);
+                const updatedUser = { ...initialUser, ...data };
+                setUser(updatedUser as User);
+                localStorage.setItem('spareparts_user', JSON.stringify(updatedUser));
+            } catch (err) {
+                console.error("Failed to fetch profile", err);
+                // Fall back to stored user
+                setUser(initialUser as User);
+            }
+        })();
+
+        // Fetch recent orders
+        api.getOrders(storeSlug, token)
+            .then(data => {
+                setRecentOrders(data.slice(0, 3)); // Only show last 3
+            })
+            .catch(err => console.error(err));
+
+        // Fetch vehicles count
+        api.getVehicles(storeSlug, token)
+            .then(data => setVehiclesCount(data.length))
+            .catch(err => console.error(err))
+            .finally(() => setLoading(false));
+
+    }, [storeSlug, router]);
 
     const stats = [
-        { label: "Total Orders", value: "24", icon: Package, color: "text-blue-600", bg: "bg-blue-50" },
-        { label: "Credit Limit", value: "LKR 100k", icon: CreditCard, color: "text-green-600", bg: "bg-green-50" },
-        { label: "Saved Vehicles", value: "3", icon: Car, color: "text-purple-600", bg: "bg-purple-50" },
-        { label: "Wishlist", value: "12", icon: Heart, color: "text-pink-600", bg: "bg-pink-50" },
+        { label: "Total Orders", value: recentOrders.length.toString(), icon: Package, color: "text-blue-600", bg: "bg-blue-50" },
+        { label: "Current Tier", value: user?.tier || 'Standard', icon: CreditCard, color: "text-green-600", bg: "bg-green-50" },
+        { label: "Saved Vehicles", value: vehiclesCount.toString(), icon: Car, color: "text-purple-600", bg: "bg-purple-50" },
+        { label: "Wishlist", value: "0", icon: Heart, color: "text-pink-600", bg: "bg-pink-50" },
     ];
 
     const handleLogout = () => {
@@ -36,6 +72,8 @@ export default function AccountPage() {
         localStorage.removeItem('spareparts_user');
         router.push(`/${storeSlug}/auth/login`);
     };
+
+    if (loading) return null; // Or a skeleton
 
     return (
         <div className="min-h-screen bg-gray-50/50">
@@ -45,22 +83,25 @@ export default function AccountPage() {
                 <div className="container-custom relative z-10">
                     <div className="flex flex-col md:flex-row items-center gap-6">
                         <div className="relative group">
-                            <div className="w-24 h-24 rounded-full border-4 border-white/10 overflow-hidden shadow-2xl">
-                                <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                            <div className="w-24 h-24 rounded-full border-4 border-white/10 overflow-hidden shadow-2xl flex items-center justify-center bg-gray-800 text-3xl font-bold">
+                                {user?.name?.charAt(0) || 'U'}
                             </div>
-                            <button className="absolute bottom-0 right-0 p-2 bg-[#C8102E] rounded-full text-white shadow-lg hover:bg-[#A60D24] transition-colors">
+                            <Link href={`/${storeSlug}/account/profile`} className="absolute bottom-0 right-0 p-2 bg-[#C8102E] rounded-full text-white shadow-lg hover:bg-[#A60D24] transition-colors">
                                 <Settings size={14} />
-                            </button>
+                            </Link>
                         </div>
                         <div className="text-center md:text-left">
-                            <h1 className="text-3xl font-bold">{user.name}</h1>
-                            <p className="text-gray-400">{user.email}</p>
+                            <h1 className="text-3xl font-bold">{user?.name}</h1>
+                            <p className="text-gray-400">{user?.email}</p>
                             <div className="flex items-center gap-2 mt-3 justify-center md:justify-start">
-                                <span className="px-3 py-1 rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black text-xs font-bold uppercase tracking-wider shadow-lg">
-                                    {user.tier}
+                                <span className={`px-3 py-1 rounded-full text-black text-xs font-bold uppercase tracking-wider shadow-lg ${user?.tier === 'Platinum' ? 'bg-gradient-to-r from-slate-200 to-slate-400' :
+                                    user?.tier === 'Gold' ? 'bg-gradient-to-r from-yellow-400 to-yellow-600' :
+                                        'bg-gray-200 text-gray-700'
+                                    }`}>
+                                    {user?.tier || 'Standard'} Member
                                 </span>
                                 <span className="px-3 py-1 rounded-full bg-gray-800 border border-gray-700 text-gray-300 text-xs">
-                                    Member since 2023
+                                    Member since {new Date(user?.createdAt || '2024-01-01').getFullYear()}
                                 </span>
                             </div>
                         </div>
@@ -92,8 +133,8 @@ export default function AccountPage() {
                                         key={item.label}
                                         href={item.href}
                                         className={`flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 group ${item.active
-                                                ? 'bg-[#C8102E]/5 text-[#C8102E] font-medium'
-                                                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                                            ? 'bg-[#C8102E]/5 text-[#C8102E] font-medium'
+                                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                                             }`}
                                     >
                                         <div className="flex items-center gap-3">
@@ -106,17 +147,19 @@ export default function AccountPage() {
                             </nav>
                         </div>
 
-                        {/* Promo Card */}
-                        <div className="bg-gradient-to-br from-[#1E3A5F] to-[#1a1b1e] rounded-2xl p-6 text-white overflow-hidden relative">
-                            <div className="relative z-10">
-                                <h3 className="font-bold text-lg mb-2">Upgrade to Platinum</h3>
-                                <p className="text-white/70 text-sm mb-4">Get 5% extra discount on all bulk orders.</p>
-                                <button className="w-full py-2 bg-white text-[#1E3A5F] rounded-lg text-sm font-bold hover:bg-gray-100 transition-colors">
-                                    View Plans
-                                </button>
+                        {/* Promo Card - Only show if not Platinum */}
+                        {user?.tier !== 'Platinum' && (
+                            <div className="bg-gradient-to-br from-[#1E3A5F] to-[#1a1b1e] rounded-2xl p-6 text-white overflow-hidden relative">
+                                <div className="relative z-10">
+                                    <h3 className="font-bold text-lg mb-2">Upgrade to Platinum</h3>
+                                    <p className="text-white/70 text-sm mb-4">Get 5% extra discount on all bulk orders.</p>
+                                    <Link href={`/${storeSlug}/account/plans`} className="block w-full py-2 bg-white text-[#1E3A5F] rounded-lg text-sm font-bold hover:bg-gray-100 transition-colors text-center">
+                                        View Plans
+                                    </Link>
+                                </div>
+                                <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-white/10 rounded-full blur-2xl" />
                             </div>
-                            <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-white/10 rounded-full blur-2xl" />
-                        </div>
+                        )}
                     </div>
 
                     {/* Main Content Area */}
@@ -146,31 +189,37 @@ export default function AccountPage() {
                                 </Link>
                             </div>
                             <div className="divide-y divide-gray-100">
-                                {recentOrders.map((order) => (
-                                    <div key={order.id} className="p-6 flex flex-col md:flex-row items-center gap-6 hover:bg-gray-50/50 transition-colors group">
-                                        <div className="flex items-center gap-4 w-full md:w-auto">
-                                            <div className="w-16 h-16 rounded-xl bg-gray-100 overflow-hidden border border-gray-200">
-                                                <img src={order.image} alt="Product" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                                            </div>
-                                            <div>
-                                                <p className="font-bold text-gray-900">{order.id}</p>
-                                                <p className="text-sm text-gray-500">{order.items} items • {order.date}</p>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-2 ml-auto">
-                                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${order.status === 'Delivered' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
-                                                }`}>
-                                                {order.status}
-                                            </span>
-                                        </div>
-                                        <div className="text-right min-w-[100px]">
-                                            <p className="font-bold text-gray-900">LKR {order.total.toLocaleString()}</p>
-                                        </div>
-                                        <button className="p-2 text-gray-400 hover:text-[#C8102E] hover:bg-[#C8102E]/5 rounded-lg transition-colors">
-                                            <ChevronRight size={20} />
-                                        </button>
+                                {recentOrders.length === 0 ? (
+                                    <div className="p-8 text-center text-gray-500">
+                                        No recent orders found.
                                     </div>
-                                ))}
+                                ) : (
+                                    recentOrders.map((order) => (
+                                        <div key={order.id} className="p-6 flex flex-col md:flex-row items-center gap-6 hover:bg-gray-50/50 transition-colors group">
+                                            <div className="flex items-center gap-4 w-full md:w-auto">
+                                                <div className="w-16 h-16 rounded-xl bg-gray-100 overflow-hidden border border-gray-200">
+                                                    <img src={order.image} alt="Product" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                                </div>
+                                                <div>
+                                                    <p className="font-bold text-gray-900">{order.id}</p>
+                                                    <p className="text-sm text-gray-500">{order.items?.length || 0} items • {order.date}</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-2 ml-auto">
+                                                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${order.status === 'Completed' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
+                                                    }`}>
+                                                    {order.status}
+                                                </span>
+                                            </div>
+                                            <div className="text-right min-w-[100px]">
+                                                <p className="font-bold text-gray-900">LKR {Number(order.total).toLocaleString()}</p>
+                                            </div>
+                                            <Link href={`/${storeSlug}/account/orders/${order.id}`} className="p-2 text-gray-400 hover:text-[#C8102E] hover:bg-[#C8102E]/5 rounded-lg transition-colors">
+                                                <ChevronRight size={20} />
+                                            </Link>
+                                        </div>
+                                    ))
+                                )}
                             </div>
                         </div>
 
@@ -183,9 +232,9 @@ export default function AccountPage() {
                                     </div>
                                     <h3 className="text-xl font-bold mb-1">Add New Vehicle</h3>
                                     <p className="text-white/80 text-sm mb-4">Register your car for compatible parts.</p>
-                                    <button className="px-4 py-2 bg-white text-[#C8102E] rounded-lg text-sm font-bold hover:bg-gray-100 transition-colors">
+                                    <Link href={`/${storeSlug}/account/vehicles/add`} className="px-4 py-2 bg-white text-[#C8102E] rounded-lg text-sm font-bold hover:bg-gray-100 transition-colors inline-block">
                                         Register Now
-                                    </button>
+                                    </Link>
                                 </div>
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-[40px] group-hover:bg-white/20 transition-colors" />
                             </div>
@@ -197,9 +246,9 @@ export default function AccountPage() {
                                     </div>
                                     <h3 className="text-xl font-bold mb-1 text-gray-900">Manage Addresses</h3>
                                     <p className="text-gray-500 text-sm mb-4">Update shipping locations for faster checkout.</p>
-                                    <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-bold hover:bg-gray-200 transition-colors">
+                                    <Link href={`/${storeSlug}/account/addresses`} className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-bold hover:bg-gray-200 transition-colors inline-block">
                                         View Addresses
-                                    </button>
+                                    </Link>
                                 </div>
                             </div>
                         </div>

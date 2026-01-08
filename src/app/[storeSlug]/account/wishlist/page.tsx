@@ -101,7 +101,7 @@ export default function WishlistPage() {
                             <Link href={`/${storeSlug}/products/${item.productId}`} className="block relative aspect-square bg-gray-50">
                                 <Image
                                     src={item.image || PLACEHOLDER_IMAGE}
-                                    alt={item.name}
+                                    alt={(item.name || 'Product Image') || 'Product Image'}
                                     fill
                                     className="object-contain p-4 group-hover:scale-105 transition-transform duration-500"
                                     onError={(e) => {
@@ -131,7 +131,7 @@ export default function WishlistPage() {
                                 <div className="flex items-center justify-between mt-4">
                                     <div className="text-xl font-bold text-[#C8102E]">
                                         <span className="text-sm text-gray-500 mr-1">{tenant?.currency || 'LKR'}</span>
-                                        {item.price.toLocaleString()}
+                                        {(item.price || 0).toLocaleString()}
                                     </div>
                                 </div>
 

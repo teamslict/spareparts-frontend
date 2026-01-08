@@ -34,8 +34,8 @@ export default function AboutPage() {
                                         the highest quality spare parts and accessories available in the market.
                                     </p>
                                     <p>
-                                        We understand that your vehicle is more than just a mode of transport—it's an investment and a passion.
-                                        That's why we meticulously select our inventory, partnering with reputable manufacturers to ensure
+                                        We understand that your vehicle is more than just a mode of transport—it&apos;s an investment and a passion.
+                                        That&apos;s why we meticulously select our inventory, partnering with reputable manufacturers to ensure
                                         every part we sell meets rigorous standards of durability and performance.
                                     </p>
                                 </>
@@ -56,34 +56,25 @@ export default function AboutPage() {
             <section className="py-16 bg-white border-y border-slate-100">
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
-                        <div className="text-center group">
-                            <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-blue-600 transition-colors duration-300">
-                                <Users size={32} className="text-blue-600 group-hover:text-white transition-colors" />
-                            </div>
-                            <p className="text-4xl font-bold text-slate-900 mb-2">10k+</p>
-                            <p className="text-slate-500 font-medium">Happy Customers</p>
-                        </div>
-                        <div className="text-center group">
-                            <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-blue-600 transition-colors duration-300">
-                                <Award size={32} className="text-blue-600 group-hover:text-white transition-colors" />
-                            </div>
-                            <p className="text-4xl font-bold text-slate-900 mb-2">100%</p>
-                            <p className="text-slate-500 font-medium">Quality Guarantee</p>
-                        </div>
-                        <div className="text-center group">
-                            <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-blue-600 transition-colors duration-300">
-                                <Truck size={32} className="text-blue-600 group-hover:text-white transition-colors" />
-                            </div>
-                            <p className="text-4xl font-bold text-slate-900 mb-2">Fast</p>
-                            <p className="text-slate-500 font-medium">Island-wide Delivery</p>
-                        </div>
-                        <div className="text-center group">
-                            <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-blue-600 transition-colors duration-300">
-                                <HeadphonesIcon size={32} className="text-blue-600 group-hover:text-white transition-colors" />
-                            </div>
-                            <p className="text-4xl font-bold text-slate-900 mb-2">24/7</p>
-                            <p className="text-slate-500 font-medium">Expert Support</p>
-                        </div>
+                        {(tenant?.aboutUs?.stats || [
+                            { label: 'Happy Customers', value: '10k+', icon: 'Users' },
+                            { label: 'Quality Guarantee', value: '100%', icon: 'Award' },
+                            { label: 'Island-wide Delivery', value: 'Fast', icon: 'Truck' },
+                            { label: 'Expert Support', value: '24/7', icon: 'HeadphonesIcon' }
+                        ]).map((stat, idx) => {
+                            const icons: Record<string, React.ComponentType<{ className?: string }>> = { Users, Award, Truck, HeadphonesIcon };
+                            const Icon = stat.icon ? (icons[stat.icon] || Award) : Award;
+
+                            return (
+                                <div key={idx} className="text-center group">
+                                    <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-blue-600 transition-colors duration-300">
+                                        <Icon size={32} className="text-blue-600 group-hover:text-white transition-colors" />
+                                    </div>
+                                    <p className="text-4xl font-bold text-slate-900 mb-2">{stat.value}</p>
+                                    <p className="text-slate-500 font-medium">{stat.label}</p>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             </section>
@@ -93,7 +84,7 @@ export default function AboutPage() {
                 <div className="max-w-7xl mx-auto px-6">
                     <h2 className="text-3xl font-bold text-slate-900 text-center mb-16">Why Choose Us?</h2>
                     <div className="grid md:grid-cols-3 gap-8">
-                        {[
+                        {(tenant?.aboutUs?.values || [
                             {
                                 title: "Quality You Can Trust",
                                 desc: "We refuse to compromise on quality. Every product in our catalog is verified for authenticity and performance standards."
@@ -106,7 +97,7 @@ export default function AboutPage() {
                                 title: "Technical Expertise",
                                 desc: "Our team isn't just salespeople; we are automotive enthusiasts and experts who understand exactly what your vehicle needs."
                             }
-                        ].map((item, idx) => (
+                        ]).map((item, idx) => (
                             <div key={idx} className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
                                 <h3 className="text-xl font-bold text-slate-900 mb-4">{item.title}</h3>
                                 <p className="text-slate-600 leading-relaxed">

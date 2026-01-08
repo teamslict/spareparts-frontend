@@ -147,6 +147,12 @@ export default function CartPage() {
                                     <span className="text-gray-600">Subtotal</span>
                                     <span>{formatPrice(cart.getTotal(storeSlug))}</span>
                                 </div>
+                                {tenant?.taxRate && tenant.taxRate > 0 && (
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-gray-600">Tax ({tenant.taxRate}%)</span>
+                                        <span>{formatPrice(cart.getTotal(storeSlug) * (tenant.taxRate / 100))}</span>
+                                    </div>
+                                )}
                                 <div className="flex justify-between text-sm">
                                     <span className="text-gray-600">Shipping</span>
                                     <span className="text-green-600">Calculated at checkout</span>
@@ -171,7 +177,9 @@ export default function CartPage() {
                             {/* Total */}
                             <div className="flex justify-between text-lg font-bold mb-6">
                                 <span>Total</span>
-                                <span style={{ color: tenant?.primaryColor || '#C8102E' }}>{formatPrice(cart.getTotal(storeSlug))}</span>
+                                <span style={{ color: tenant?.primaryColor || '#C8102E' }}>
+                                    {formatPrice(cart.getTotal(storeSlug) * (1 + (tenant?.taxRate ? tenant.taxRate / 100 : 0)))}
+                                </span>
                             </div>
 
                             <Link

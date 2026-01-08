@@ -5,22 +5,27 @@ import { Search, Package, MapPin, Calendar, CheckCircle } from 'lucide-react';
 
 export default function TrackOrderPage() {
     const [orderId, setOrderId] = useState('');
-    const [status, setStatus] = useState<any>(null);
+    const [status, setStatus] = useState<{ orderNumber: string; status: string; steps: { title: string; completed: boolean; date?: string }[] } | null>(null);
 
-    const handleTrack = (e: React.FormEvent) => {
+    const handleTrack = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Mock tracking logic for demo
-        setStatus({
-            id: orderId,
-            status: 'Processing',
-            date: new Date().toLocaleDateString(),
-            steps: [
-                { title: 'Order Placed', completed: true, date: 'Today' },
-                { title: 'Processing', completed: true, date: 'Today' },
-                { title: 'Shipped', completed: false, date: 'Pending' },
-                { title: 'Delivered', completed: false, date: 'Pending' },
-            ]
-        });
+        try {
+            const { api } = await import('@/lib/api');
+            // Assuming we can get subdomain from path or context if needed, but context is better.
+            // The page doesn't seem to use useTenant yet, let's fix that or pass dummy if needed
+            // Actually this is a client page inside [storeSlug] layout so we can grab it from path or context.
+            // But Page component props are easier if not inside layout?
+            // Let's use window location or passed prop if available. 
+            // Better: useTenant() hook.
+            const subdomain = window.location.pathname.split('/')[1];
+
+            const data = await api.trackOrder(subdomain, orderId);
+            setStatus(data);
+        } catch (error) {
+            console.error(error);
+            alert('Order not found or error tracking');
+            setStatus(null);
+        }
     };
 
     return (
@@ -54,7 +59,7 @@ export default function TrackOrderPage() {
                         <div className="flex items-center justify-between mb-8 pb-8 border-b border-slate-100">
                             <div>
                                 <p className="text-sm text-slate-500 uppercase tracking-wider font-bold">Order ID</p>
-                                <p className="text-2xl font-bold text-slate-900">{status.id}</p>
+                                <p className="text-2xl font-bold text-slate-900">{status.orderNumber}</p>
                             </div>
                             <div className="text-right">
                                 <p className="text-sm text-slate-500 uppercase tracking-wider font-bold">Estimated Delivery</p>
@@ -63,7 +68,7 @@ export default function TrackOrderPage() {
                         </div>
 
                         <div className="space-y-8">
-                            {status.steps.map((step: any, idx: number) => (
+                            {status.steps.map((step: { title: string; completed: boolean; date?: string }, idx: number) => (
                                 <div key={idx} className="flex items-start gap-4">
                                     <div className="flex flex-col items-center">
                                         <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${step.completed ? 'bg-blue-600 border-blue-600 text-white' : 'bg-white border-slate-200 text-slate-300'}`}>

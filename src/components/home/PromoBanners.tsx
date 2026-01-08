@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useTenant } from '@/lib/tenant-context';
 import { PLACEHOLDER_IMAGE } from '@/lib/constants';
+import { resolveImageUrl } from '@/lib/utils';
 
 const defaultBanners = [
     {
@@ -30,6 +31,9 @@ export function PromoBanners() {
     // Use banners from tenant config or defaults
     const banners = tenant?.promoBanners?.length ? tenant.promoBanners : defaultBanners;
 
+    console.log('[DEBUG-FRONTEND] Tenant Config:', tenant);
+    console.log('[DEBUG-FRONTEND] Resolved Banners:', banners);
+
     return (
         <section className="py-16 md:py-24 my-12">
             <div className="container-custom">
@@ -54,7 +58,7 @@ export function PromoBanners() {
                                     {/* Image or placeholder */}
                                     <div className="relative w-28 h-28 md:w-32 md:h-32 transform group-hover:scale-110 transition-transform duration-300">
                                         <Image
-                                            src={banner.imageUrl || PLACEHOLDER_IMAGE}
+                                            src={resolveImageUrl(banner.imageUrl) || PLACEHOLDER_IMAGE}
                                             alt={banner.subtitle}
                                             fill
                                             className="object-contain"

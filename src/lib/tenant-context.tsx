@@ -72,12 +72,21 @@ export interface TenantConfig {
         imageUrl: string;
     }[];
 
+    // Services (editable from backend)
+    services?: {
+        icon: string;
+        title: string;
+        description: string;
+        linkText: string;
+        linkUrl: string; // can be mailto:, tel:, or internal path
+    }[];
+
     // Dynamic Pages Content (About, Contact, etc.)
     aboutUs?: {
         story?: string;
         mission?: string;
         vision?: string;
-        stats?: { label: string; value: string; }[];
+        stats?: { label: string; value: string; icon?: string; }[];
         values?: { title: string; desc: string; }[];
     };
 
@@ -164,6 +173,14 @@ const defaultTenant: TenantConfig = {
             bgColor: '#F5F5F5',
         },
     ],
+
+    // Default Services (editable from backend)
+    services: [
+        { icon: 'Search', title: 'Parts Consultation', description: 'Not sure which part fits your vehicle? Our experts use official catalogs to verify compatibility.', linkText: 'FREE SERVICE', linkUrl: '#' },
+        { icon: 'Car', title: 'Special Orders', description: 'Looking for a rare JDM part? We can special order directly from manufacturers in Japan & Thailand.', linkText: 'REQUEST QUOTE', linkUrl: '#' },
+        { icon: 'Wrench', title: 'Installation Support', description: 'We partner with a network of trusted garages for professional installation.', linkText: 'ASK US', linkUrl: '#' },
+        { icon: 'PenTool', title: 'Wholesale Supply', description: 'Running a garage? We offer special B2B pricing and bulk supply agreements.', linkText: 'JOIN PROGRAM', linkUrl: '#' },
+    ],
 };
 
 const TenantContext = createContext<TenantContextType>({
@@ -199,15 +216,20 @@ export function TenantProvider({
                 slug = process.env.NEXT_PUBLIC_DEFAULT_TENANT || 'demo';
             }
 
+            console.log('[TenantProvider] Fetching config for slug:', slug);
+
             // Fetch tenant config from backend
             const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://erp.slict.lk';
             // Note: usage of 'subdomain' query param is legacy naming, backend treats it as the lookup key.
             const response = await fetch(`${apiUrl}/api/public/spareparts/config?subdomain=${slug}`, {
-                next: { revalidate: 60 }, // Cache for 60 seconds
+                cache: 'no-store', // Disable caching to ensure real-time updates
             });
+
+            console.log('[TenantProvider] API Response Status:', response.status);
 
             if (response.ok) {
                 const data = await response.json();
+                console.log('[TenantProvider] Data received:', data);
 
                 // Merge backend data with defaults
                 setTenant({
@@ -235,6 +257,7 @@ export function TenantProvider({
                     heroSlides: data.config?.heroSlides || defaultTenant.heroSlides,
                     benefits: data.config?.benefits || defaultTenant.benefits,
                     promoBanners: data.config?.promoBanners || defaultTenant.promoBanners,
+                    services: data.config?.services || defaultTenant.services,
                     featuredCategories: data.config?.featuredCategories || [],
                     metaTitle: data.config?.metaTitle,
                     metaDescription: data.config?.metaDescription,

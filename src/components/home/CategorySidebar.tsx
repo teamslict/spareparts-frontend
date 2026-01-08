@@ -6,8 +6,15 @@ import { useState, useEffect } from 'react';
 import { useTenant } from '@/lib/tenant-context';
 import { motion } from 'framer-motion';
 
+interface Category {
+    name: string;
+    slug: string;
+    hasSubmenu?: boolean;
+    icon?: string;
+}
+
 // Default categories - will be fetched from API
-const defaultCategories = [
+const defaultCategories: Category[] = [
     { name: 'TOYOTA', slug: 'toyota', hasSubmenu: true, icon: '🚗' },
     { name: 'NISSAN', slug: 'nissan', hasSubmenu: true, icon: '🚙' },
     { name: 'MITSUBISHI', slug: 'mitsubishi', hasSubmenu: true, icon: '🏎️' },
@@ -26,7 +33,7 @@ export function CategorySidebar() {
     const [showAll, setShowAll] = useState(false);
     const { tenant } = useTenant();
 
-    const [categories, setCategories] = useState<any[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
 
     useEffect(() => {
         async function fetchBrands() {
@@ -34,7 +41,7 @@ export function CategorySidebar() {
             try {
                 const { api } = await import('@/lib/api');
                 const brands = await api.getBrands(tenant.subdomain);
-                const mapped = brands.map(b => ({
+                const mapped: Category[] = brands.map(b => ({
                     name: b.name,
                     slug: b.name.toLowerCase().replace(/\s+/g, '-'),
                     hasSubmenu: false,
@@ -76,7 +83,7 @@ export function CategorySidebar() {
                         key={category.slug}
                     >
                         <Link
-                            href={`/brand/${category.slug}`}
+                            href={`/${tenant?.subdomain || 'default'}/products?brand=${category.slug}`}
                             className="group relative flex items-center justify-between px-6 py-3.5 hover:bg-white/5 transition-all border-l-[3px] border-transparent hover:border-blue-500"
                         >
                             <div className="flex items-center gap-3 relative z-10">

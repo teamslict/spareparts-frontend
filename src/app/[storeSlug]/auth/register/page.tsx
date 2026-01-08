@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useTenant } from '@/lib/tenant-context';
 
 import { api } from '@/lib/api';
+import { getErrorMessage } from '@/lib/error-utils';
 
 export default function RegisterPage() {
     const { tenant } = useTenant();
@@ -36,9 +37,9 @@ export default function RegisterPage() {
             await api.registerCustomer(storeSlug, formData);
             alert('Account created successfully! Please sign in.');
             router.push(`/${storeSlug}/auth/login`);
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error(error);
-            alert(error.message || 'Registration failed');
+            alert(getErrorMessage(error));
         } finally {
             setIsLoading(false);
         }

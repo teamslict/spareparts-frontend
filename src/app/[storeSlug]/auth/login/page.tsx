@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useTenant } from '@/lib/tenant-context';
 
 import { api } from '@/lib/api';
+import { getErrorMessage } from '@/lib/error-utils';
 
 export default function LoginPage() {
     const { tenant } = useTenant();
@@ -35,9 +36,9 @@ export default function LoginPage() {
             // Redirect to home or account
             router.push(`/${storeSlug}`);
             router.refresh(); // Refresh to update UI state if we had a user listener
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error(error);
-            alert(error.message || 'Login failed');
+            alert(getErrorMessage(error));
         } finally {
             setIsLoading(false);
         }
