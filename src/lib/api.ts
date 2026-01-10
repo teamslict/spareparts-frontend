@@ -3,6 +3,19 @@ import { TenantConfig } from './tenant-context';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://erp.slict.lk';
 
+async function fetchWithRetry(url: string, options: RequestInit = {}, retries = 3, backoff = 1000): Promise<Response> {
+    try {
+        const res = await fetch(url, options);
+        if (res.ok || res.status === 404 || retries <= 0) return res;
+        throw new Error(`Request failed with status ${res.status}`);
+    } catch (err) {
+        if (retries <= 0) throw err;
+        // console.warn(`Retrying ${url} (${retries} left)...`);
+        await new Promise(r => setTimeout(r, backoff));
+        return fetchWithRetry(url, options, retries - 1, backoff * 1.5);
+    }
+}
+
 export interface Product {
     id: string;
     name: string;
@@ -84,7 +97,7 @@ export const api = {
             if (params.model) query.append('model', params.model);
             if (params.year) query.append('year', params.year);
 
-            const res = await fetch(`${API_URL}/api/public/spareparts/products?${query.toString()}`, {
+            const res = await fetchWithRetry(`${API_URL}/api/public/spareparts/products?${query.toString()}`, {
                 next: { revalidate: 60 }
             });
 
@@ -103,7 +116,7 @@ export const api = {
      */
     getCategories: async (storeSlug: string): Promise<Category[]> => {
         try {
-            const res = await fetch(`${API_URL}/api/public/spareparts/categories?subdomain=${storeSlug}`, {
+            const res = await fetchWithRetry(`${API_URL}/api/public/spareparts/categories?subdomain=${storeSlug}`, {
                 next: { revalidate: 300 }
             });
             if (!res.ok) return [];
@@ -119,7 +132,7 @@ export const api = {
      */
     getBrands: async (storeSlug: string): Promise<Brand[]> => {
         try {
-            const res = await fetch(`${API_URL}/api/public/spareparts/brands?subdomain=${storeSlug}`, {
+            const res = await fetchWithRetry(`${API_URL}/api/public/spareparts/brands?subdomain=${storeSlug}`, {
                 next: { revalidate: 300 }
             });
             if (!res.ok) return [];
@@ -135,7 +148,7 @@ export const api = {
      */
     getProduct: async (storeSlug: string, slug: string): Promise<Product | null> => {
         try {
-            const res = await fetch(`${API_URL}/api/public/spareparts/products/${slug}?subdomain=${storeSlug}`, {
+            const res = await fetchWithRetry(`${API_URL}/api/public/spareparts/products/${slug}?subdomain=${storeSlug}`, {
                 next: { revalidate: 60 }
             });
             if (!res.ok) return null;
