@@ -9,7 +9,7 @@ import { PromoBanners } from '@/components/home/PromoBanners';
 
 export default function HomePage({ params }: { params?: { storeSlug: string } }) {
   return (
-    <div className="flex flex-col pb-8 bg-slate-50 min-h-screen text-slate-900">
+    <div className="flex flex-col bg-slate-50 min-h-screen text-slate-900">
       {/* Hero Section with Categories Sidebar */}
       <section className="pt-6 pb-4">
         <div className="container-custom">
@@ -51,7 +51,7 @@ export default function HomePage({ params }: { params?: { storeSlug: string } })
       <FeaturedCategorySections />
 
       {/* Promo Banners */}
-      <div className="py-6">
+      <div className="pt-6 pb-0">
         <PromoBanners />
       </div>
     </div>

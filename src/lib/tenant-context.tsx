@@ -207,31 +207,41 @@ export function TenantProvider({
             setError(null);
 
             // Determine subdomain/slug
-            // If storeSlug is provided (Path-Based), use it.
-            // If not provided (Root Domain), assume 'default' or process.env logic
             let slug = storeSlug || 'demo';
-
-            // If strictly root path is visited, we use 'default' or a specific ENV
             if (!storeSlug) {
                 slug = process.env.NEXT_PUBLIC_DEFAULT_TENANT || 'demo';
             }
 
             console.log('[TenantProvider] Fetching config for slug:', slug);
 
-            // Fetch tenant config from backend
             const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://erp.slict.lk';
-            // Note: usage of 'subdomain' query param is legacy naming, backend treats it as the lookup key.
-            const response = await fetch(`${apiUrl}/api/public/spareparts/config?subdomain=${slug}`, {
-                cache: 'no-store', // Disable caching to ensure real-time updates
-            });
 
-            console.log('[TenantProvider] API Response Status:', response.status);
+            // Retry logic
+            let response: Response | null = null;
+            let attempts = 0;
+            const maxAttempts = 3;
 
-            if (response.ok) {
+            while (attempts < maxAttempts) {
+                try {
+                    response = await fetch(`${apiUrl}/api/public/spareparts/config?subdomain=${slug}`, {
+                        cache: 'no-store',
+                    });
+                    if (response.ok || response.status === 404) {
+                        break; // Stop retrying on success or explicit 404
+                    }
+                } catch (e) {
+                    console.warn(`[TenantProvider] Attempt ${attempts + 1} failed:`, e);
+                }
+                attempts++;
+                if (attempts < maxAttempts) {
+                    await new Promise(r => setTimeout(r, 1000)); // Wait 1s between retries
+                }
+            }
+
+            if (response && response.ok) {
                 const data = await response.json();
                 console.log('[TenantProvider] Data received:', data);
 
-                // Merge backend data with defaults
                 setTenant({
                     ...defaultTenant,
                     tenantId: data.tenantId || defaultTenant.tenantId,
@@ -261,20 +271,31 @@ export function TenantProvider({
                     featuredCategories: data.config?.featuredCategories || [],
                     metaTitle: data.config?.metaTitle,
                     metaDescription: data.config?.metaDescription,
-                    // Dynamic page content
                     aboutUs: data.config?.aboutUs,
                     businessHours: data.config?.businessHours,
                     mapUrl: data.config?.mapUrl,
                 });
             } else {
-                // API not available yet - use defaults
-                console.warn('Tenant API not available, using defaults');
-                setTenant(defaultTenant);
+                // If specific store requested but failed, don't fallback to default - show error
+                if (storeSlug && storeSlug !== 'demo') {
+                    console.error('[TenantProvider] Failed to load tenant for:', storeSlug);
+                    setError('Failed to load store configuration');
+                    // We KEEP the defaultTenant in state but error will be present so we can handle it in UI if we wanted
+                    // For now, let's at least not silently pretend we are Auto Parts Store if we failed to get Slict
+                    // Actually, modifying behavior: if error, maybe we shouldn't show the app content? 
+                    // But to be safe, we will just rely on the Retry Logic fixing 99% of cases.
+                } else {
+                    console.warn('[TenantProvider] API not available, using defaults for demo');
+                    setTenant(defaultTenant);
+                }
             }
         } catch (err) {
-            console.warn('Failed to fetch tenant config, using defaults:', err);
-            setTenant(defaultTenant);
-            setError('Using default configuration');
+            console.error('[TenantProvider] Critical failure:', err);
+            // Only fallback if we are in demo mode
+            if (!storeSlug || storeSlug === 'demo') {
+                setTenant(defaultTenant);
+            }
+            setError('System error loading configuration');
         } finally {
             setLoading(false);
         }

@@ -17,7 +17,7 @@ export function Footer() {
     return (
         <footer className="w-full bg-slate-900 text-slate-300 font-inter mt-auto">
             {/* Main Footer Content */}
-            <div className="container-custom py-12 md:py-16">
+            <div className="container-custom py-8 md:py-12">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8">
 
                     {/* Brand Column (Span 4) */}
