@@ -6,18 +6,25 @@ import { Search, ShoppingCart, User, Menu, ChevronDown, Phone, X, Heart } from '
 import { useTenant } from '@/lib/tenant-context';
 import { useCart } from '@/lib/cart-store';
 import { useWishlist } from '@/lib/wishlist-store';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+
+// Empty array constant to avoid creating new reference on each render
+const EMPTY_ARRAY: never[] = [];
 
 export function Header() {
     const { tenant } = useTenant();
     const storeSlug = tenant?.subdomain || 'demo';
 
-    // Use Zustand selector pattern for reactive updates
-    const cartItems = useCart((state) => state.carts[storeSlug] || []);
-    const wishlistItems = useWishlist((state) => state.wishlists[storeSlug] || []);
+    // Get the full carts/wishlists objects and derive items from them
+    const carts = useCart((state) => state.carts);
+    const wishlists = useWishlist((state) => state.wishlists);
+
+    // Memoize to prevent creating new references
+    const cartItems = useMemo(() => carts[storeSlug] || EMPTY_ARRAY, [carts, storeSlug]);
+    const wishlistItems = useMemo(() => wishlists[storeSlug] || EMPTY_ARRAY, [wishlists, storeSlug]);
 
     // Derive counts - these will update automatically when items change
-    const cartCount = cartItems.reduce((count, item) => count + item.quantity, 0);
+    const cartCount = cartItems.reduce((count: number, item: { quantity: number }) => count + item.quantity, 0);
     const wishlistCount = wishlistItems.length;
 
     const [searchQuery, setSearchQuery] = useState('');
