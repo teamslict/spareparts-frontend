@@ -7,6 +7,7 @@ import { useTenant } from '@/lib/tenant-context';
 import { api, type Product } from '@/lib/api';
 import { ProductCard } from '@/components/product/ProductCard';
 import { motion } from 'framer-motion';
+import { useParams } from 'next/navigation';
 
 interface DynamicCategorySectionProps {
     title: string;
@@ -15,7 +16,9 @@ interface DynamicCategorySectionProps {
 
 export function DynamicCategorySection({ title, slug }: DynamicCategorySectionProps) {
     const { tenant } = useTenant();
-    const storeSlug = tenant?.subdomain || 'demo';
+    const params = useParams();
+    // CRITICAL: Use URL params directly
+    const storeSlug = (params?.storeSlug as string) || 'demo';
 
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);

@@ -5,6 +5,7 @@ import { ChevronRight, Menu, Grid } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useTenant } from '@/lib/tenant-context';
 import { motion } from 'framer-motion';
+import { useParams } from 'next/navigation';
 
 interface Category {
     name: string;
@@ -32,15 +33,18 @@ const defaultCategories: Category[] = [
 export function CategorySidebar() {
     const [showAll, setShowAll] = useState(false);
     const { tenant } = useTenant();
+    const params = useParams();
+    // CRITICAL: Use URL params directly
+    const storeSlug = (params?.storeSlug as string) || 'demo';
 
     const [categories, setCategories] = useState<Category[]>([]);
 
     useEffect(() => {
         async function fetchBrands() {
-            if (!tenant) return;
+            if (!storeSlug) return;
             try {
                 const { api } = await import('@/lib/api');
-                const brands = await api.getBrands(tenant.subdomain);
+                const brands = await api.getBrands(storeSlug);
                 const mapped: Category[] = brands.map(b => ({
                     name: b.name,
                     slug: b.name.toLowerCase().replace(/\s+/g, '-'),

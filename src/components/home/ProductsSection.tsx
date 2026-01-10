@@ -5,6 +5,7 @@ import { ProductCard, ProductCardProps } from '@/components/product/ProductCard'
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTenant } from '@/lib/tenant-context';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useParams } from 'next/navigation';
 
 const tabs = [
     { id: 'latest', label: 'Latest Parts' },
@@ -18,18 +19,21 @@ const tabs = [
 export function ProductsSection() {
     const [activeTab, setActiveTab] = useState('latest');
     const { tenant } = useTenant();
+    const params = useParams();
+    // CRITICAL: Use URL params directly, NOT tenant.subdomain
+    const storeSlug = (params?.storeSlug as string) || 'demo';
 
     const [products, setProducts] = useState<ProductCardProps[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         async function fetchProducts() {
-            if (!tenant) return;
+            if (!storeSlug) return;
 
             setLoading(true);
             try {
                 const { api } = await import('@/lib/api');
-                const res = await api.getProducts(tenant.subdomain, {
+                const res = await api.getProducts(storeSlug, {
                     limit: 10,
                     sort: activeTab // Pass 'latest', 'popular', or 'bestsellers' directly
                 });

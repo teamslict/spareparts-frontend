@@ -8,12 +8,14 @@ import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 import { useTenant } from '@/lib/tenant-context';
 import { api, Product } from '@/lib/api';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useParams } from 'next/navigation';
 
 export default function ProductsPage() {
     const { tenant } = useTenant();
     const searchParams = useSearchParams();
-    const storeSlug = tenant?.subdomain || 'demo';
+    const params = useParams();
+    // CRITICAL: Use URL params directly, NOT tenant.subdomain (which can be 'demo' on failure)
+    const storeSlug = (params?.storeSlug as string) || 'demo';
 
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
