@@ -33,8 +33,8 @@ export function DynamicCategorySection({ title, slug }: DynamicCategorySectionPr
     if (!loading && products.length === 0) return null;
 
     return (
-        <section className="py-12">
-            <div className="container mx-auto px-4">
+        <section className="py-6">
+            <div className="container-custom">
                 {/* Section Header */}
                 <div className="flex justify-between items-center mb-8">
                     <h2 className="text-3xl font-bold text-white tracking-tight">{title}</h2>

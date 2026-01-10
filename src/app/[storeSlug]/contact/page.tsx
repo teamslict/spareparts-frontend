@@ -24,17 +24,18 @@ export default function ContactPage() {
     return (
         <div className="bg-slate-50 min-h-screen">
             {/* Hero */}
-            <section className="bg-slate-900 text-white py-20">
-                <div className="max-w-7xl mx-auto px-6 text-center">
+            <section className="bg-slate-900 text-white py-12 md:py-16 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 to-transparent" />
+                <div className="container-custom relative z-10 text-center">
                     <h1 className="text-4xl md:text-5xl font-bold mb-6">Contact Us</h1>
-                    <p className="text-xl text-slate-300 max-w-2xl mx-auto">
+                    <p className="text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed">
                         Have questions about a part or need technical advice? We&apos;re here to help.
                     </p>
                 </div>
             </section>
 
-            <section className="py-20">
-                <div className="max-w-7xl mx-auto px-6">
+            <section className="py-12">
+                <div className="container-custom">
                     <div className="grid lg:grid-cols-3 gap-12">
                         {/* Contact Info */}
                         <div className="lg:col-span-1 space-y-8">

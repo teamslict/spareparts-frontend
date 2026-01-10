@@ -22,6 +22,12 @@ export interface Product {
         discountType: string;
         discountValue: number;
     }>;
+    tax?: {
+        enabled: boolean;
+        rate: number;
+        amount: number;
+        included: boolean;
+    };
 }
 
 export interface Category {
@@ -350,6 +356,52 @@ export const api = {
             throw new Error(json?.error || 'Failed to change password');
         }
         return await res.json();
+    },
+
+    /**
+     * Check applicable promotions for cart
+     */
+    checkPromotions: async (storeSlug: string, data: {
+        items: { productId: string; name: string; price: number; quantity: number; category?: string }[];
+        customerId?: string;
+        promoCode?: string;
+    }): Promise<{
+        promotions: Array<{
+            id: string;
+            name: string;
+            description?: string;
+            code?: string;
+            type: string;
+            discountType: string;
+            discountValue: number;
+            discountAmount: number;
+            source: 'AUTOMATIC' | 'CODE' | 'QUANTITY';
+            productId?: string;
+            productName?: string;
+            minQuantity?: number;
+        }>;
+        totalDiscount: number;
+        cartTotal: number;
+        codeError?: string;
+    }> => {
+        try {
+            const res = await fetch(`${API_URL}/api/public/spareparts/promotions/check`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ ...data, subdomain: storeSlug })
+            });
+
+            if (!res.ok) {
+                const error = await res.json().catch(() => ({ error: 'Failed to check promotions' }));
+                throw new Error(error.error || 'Failed to check promotions');
+            }
+            return await res.json();
+        } catch (error) {
+            console.error('API Error:', error);
+            return { promotions: [], totalDiscount: 0, cartTotal: 0 };
+        }
     }
 };
 

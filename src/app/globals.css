@@ -12,6 +12,10 @@
   --foreground: #0f172a;
   /* Slate-900 */
 
+  --primary-red-dark: #b91c1c;
+  --primary-blue: #2563eb;
+  --primary-blue-dark: #1d4ed8;
+
   --white: #ffffff;
   --gray-50: #f8fafc;
   --gray-100: #f1f5f9;
@@ -41,10 +45,26 @@
   --color-foreground: var(--foreground);
 }
 
-* {
+/* Reset - compatible with Tailwind */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* More targeted reset */
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+ul,
+ol {
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
 }
 
 body {

@@ -91,8 +91,8 @@ export default function ProductsPage() {
                     {/* Main Content */}
                     <main className="flex-1">
                         {/* Header with Vehicle Filter */}
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-                            <div className="flex items-center gap-4">
+                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
+                            <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
                                 <h1 className="text-2xl font-bold text-gray-800">All Products</h1>
                                 <VehicleSelector onSelect={handleVehicleSelect} />
                             </div>

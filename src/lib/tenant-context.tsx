@@ -261,6 +261,10 @@ export function TenantProvider({
                     featuredCategories: data.config?.featuredCategories || [],
                     metaTitle: data.config?.metaTitle,
                     metaDescription: data.config?.metaDescription,
+                    // Dynamic page content
+                    aboutUs: data.config?.aboutUs,
+                    businessHours: data.config?.businessHours,
+                    mapUrl: data.config?.mapUrl,
                 });
             } else {
                 // API not available yet - use defaults

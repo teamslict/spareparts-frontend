@@ -8,14 +8,14 @@ export default function TermsPage() {
 
     return (
         <div className="bg-slate-50 min-h-screen pb-20">
-            <section className="bg-slate-900 text-white py-16">
-                <div className="max-w-4xl mx-auto px-6 text-center">
+            <section className="bg-slate-900 text-white py-12 md:py-16">
+                <div className="container-custom text-center">
                     <h1 className="text-3xl md:text-4xl font-bold mb-4">Terms of Service</h1>
                     <p className="text-slate-400">Last updated: {new Date().toLocaleDateString()}</p>
                 </div>
             </section>
 
-            <div className="max-w-4xl mx-auto px-6 -mt-8">
+            <div className="container-custom -mt-8">
                 <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 md:p-12 prose prose-slate max-w-none">
                     <h2 className="text-slate-900">1. Acceptance of Terms</h2>
                     <p>

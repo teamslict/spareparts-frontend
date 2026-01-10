@@ -9,9 +9,9 @@ import { PromoBanners } from '@/components/home/PromoBanners';
 
 export default function HomePage({ params }: { params?: { storeSlug: string } }) {
   return (
-    <div className="flex flex-col gap-10 pb-12 bg-slate-50 min-h-screen text-slate-900">
+    <div className="flex flex-col pb-8 bg-slate-50 min-h-screen text-slate-900">
       {/* Hero Section with Categories Sidebar */}
-      <section className="pt-6 pb-2">
+      <section className="pt-6 pb-4">
         <div className="container-custom">
           <div className="flex flex-col lg:flex-row gap-6">
             {/* Categories Sidebar - Hidden on mobile, visible on lg */}
@@ -28,27 +28,32 @@ export default function HomePage({ params }: { params?: { storeSlug: string } })
       </section>
 
       {/* Benefits Bar */}
-      <BenefitsBar />
+      <div className="py-4">
+        <BenefitsBar />
+      </div>
 
       {/* Visual Category Grid */}
-      <CategoryGrid />
+      <div className="py-6">
+        <CategoryGrid />
+      </div>
 
       {/* Products Section */}
-      <ProductsSection />
+      <div className="py-6">
+        <ProductsSection />
+      </div>
 
       {/* Brand Categories */}
-      <BrandCategories />
+      <div className="py-6">
+        <BrandCategories />
+      </div>
 
-      {/* Dynamic Featured Categories - Replaces hardcoded sections */}
+      {/* Dynamic Featured Categories */}
       <FeaturedCategorySections />
 
       {/* Promo Banners */}
-      <div>
+      <div className="py-6">
         <PromoBanners />
       </div>
-
-      {/* Explicit Footer Spacer */}
-      <div className="h-24 w-full" aria-hidden="true" />
     </div>
   );
 }

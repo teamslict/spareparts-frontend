@@ -8,14 +8,14 @@ export default function ShippingPage() {
 
     return (
         <div className="bg-slate-50 min-h-screen pb-20">
-            <section className="bg-slate-900 text-white py-16">
-                <div className="max-w-4xl mx-auto px-6 text-center">
+            <section className="bg-slate-900 text-white py-12 md:py-16">
+                <div className="container-custom text-center">
                     <h1 className="text-3xl md:text-4xl font-bold mb-4">Shipping Information</h1>
-                    <p className="text-slate-400">Fast, reliable, and secure delivery to your doorstep.</p>
+                    <p className="text-slate-400 max-w-2xl mx-auto">Fast, reliable, and secure delivery to your doorstep.</p>
                 </div>
             </section>
 
-            <div className="max-w-4xl mx-auto px-6 -mt-8">
+            <div className="container-custom -mt-8">
                 <div className="grid md:grid-cols-3 gap-6 mb-12">
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 text-center">
                         <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">

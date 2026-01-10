@@ -53,7 +53,7 @@ export async function generateMetadata({ params }: { params: Promise<{ storeSlug
 
     const storeName = tenant?.storeName || 'Auto Parts Store';
     const currency = tenant?.currency || 'LKR';
-    const price = product.salePrice > 0 ? `${currency} ${Number(product.salePrice).toLocaleString()}` : 'Contact for Price';
+    const price = `${currency} ${Number(product.salePrice).toLocaleString()}`;
 
     // Build rich description
     const description = product.description

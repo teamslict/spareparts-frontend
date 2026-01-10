@@ -47,15 +47,13 @@ export function ProductCard({
         e.preventDefault();
         e.stopPropagation();
 
-        if (price !== null) {
-            addItem(storeSlug, {
-                productId: id,
-                name,
-                sku,
-                price,
-                image: image || PRODUCT_PLACEHOLDER,
-            });
-        }
+        addItem(storeSlug, {
+            productId: id,
+            name,
+            sku,
+            price: price || 0, // Fallback if null, but allow add
+            image: image || PRODUCT_PLACEHOLDER,
+        });
     };
 
     const handleWishlistToggle = (e: React.MouseEvent) => {
@@ -183,16 +181,14 @@ export function ProductCard({
                 {/* Price and Action Row */}
                 <div className="pt-2 flex items-center justify-between">
                     <div>
-                        {price !== null ? (
+                        <div>
                             <div className="flex flex-col">
-                                <span className="text-xs text-slate-500 line-through mb-0.5">LKR {(price * 1.1).toLocaleString()}</span>
+                                <span className="text-xs text-slate-500 line-through mb-0.5">LKR {((price || 0) * 1.1).toLocaleString()}</span>
                                 <span className="text-xl font-bold text-slate-900 tracking-tight">
-                                    {formatPrice(price)}
+                                    {formatPrice(price || 0)}
                                 </span>
                             </div>
-                        ) : (
-                            <span className="text-sm font-semibold text-blue-400">Ask for Price</span>
-                        )}
+                        </div>
                     </div>
                 </div>
 

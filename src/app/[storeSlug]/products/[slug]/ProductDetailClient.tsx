@@ -27,26 +27,24 @@ export function ProductDetailClient({ product, storeSlug }: Props) {
     const { tenant } = useTenant();
 
     const images = (product.images && product.images.length > 0) ? product.images : [PLACEHOLDER_IMAGE];
-    const price = product.salePrice > 0 ? product.salePrice : null;
+    const price = product.salePrice;
 
     const handleAddToCart = () => {
-        if (price !== null) {
-            addItem(storeSlug, {
-                productId: product.id,
-                name: product.name,
-                sku: product.sku,
-                price: Number(price),
-                image: images[0],
-            }, quantity);
+        addItem(storeSlug, {
+            productId: product.id,
+            name: product.name,
+            sku: product.sku,
+            price: Number(price),
+            image: images[0],
+        }, quantity);
 
-            setAddedItem({
-                name: product.name,
-                image: images[0],
-                price: Number(price),
-                quantity: quantity
-            });
-            setIsDialogOpen(true);
-        }
+        setAddedItem({
+            name: product.name,
+            image: images[0],
+            price: Number(price),
+            quantity: quantity
+        });
+        setIsDialogOpen(true);
     };
 
     const handleQuantityChange = (delta: number) => {
@@ -174,29 +172,22 @@ export function ProductDetailClient({ product, storeSlug }: Props) {
                                         <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-red-500/5 to-transparent rounded-full blur-2xl"></div>
 
                                         <div className="flex items-start justify-between mb-4 relative z-10">
-                                            {price !== null ? (
-                                                <div className="flex flex-col">
-                                                    <span className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-1">Price</span>
-                                                    <div className="flex items-baseline gap-1">
-                                                        <span className="text-lg font-bold text-gray-500">{tenant?.currency || 'LKR'}</span>
-                                                        <span className="text-5xl font-black bg-gradient-to-r from-[#C8102E] to-[#e91e3a] bg-clip-text text-transparent" style={{ WebkitTextFillColor: 'transparent' }}>
-                                                            {Number(price).toLocaleString()}
+                                            <div className="flex flex-col">
+                                                <span className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-1">Price</span>
+                                                <div className="flex items-baseline gap-1">
+                                                    <span className="text-lg font-bold text-gray-500">{tenant?.currency || 'LKR'}</span>
+                                                    <span className="text-5xl font-black bg-gradient-to-r from-[#C8102E] to-[#e91e3a] bg-clip-text text-transparent" style={{ WebkitTextFillColor: 'transparent' }}>
+                                                        {Number(price).toLocaleString()}
+                                                    </span>
+                                                    {product.tax?.enabled && (
+                                                        <span className="text-sm font-medium text-gray-500 mb-1 ml-1">
+                                                            {product.tax.included
+                                                                ? `(Inc. ${product.tax.rate}% Tax)`
+                                                                : `+ ${product.tax.rate}% Tax`}
                                                         </span>
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                <div>
-                                                    <span className="text-lg font-semibold text-gray-800">Contact Us for Price</span>
-                                                    {tenant?.contactPhone && (
-                                                        <a
-                                                            href={`tel:${tenant.contactPhone}`}
-                                                            className="block text-[#C8102E] font-bold text-xl mt-1 hover:underline"
-                                                        >
-                                                            {tenant.contactPhone}
-                                                        </a>
                                                     )}
                                                 </div>
-                                            )}
+                                            </div>
 
                                             {/* Stock Status */}
                                             <div className={`px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 ${product.stockQty > 0
@@ -254,7 +245,7 @@ export function ProductDetailClient({ product, storeSlug }: Props) {
                                             {/* Add to Cart Button */}
                                             <button
                                                 onClick={handleAddToCart}
-                                                disabled={price === null || product.stockQty <= 0}
+                                                disabled={product.stockQty <= 0}
                                                 className="flex-1 h-14 bg-gradient-to-r from-[#C8102E] to-[#e91e3a] text-white font-bold rounded-xl hover:shadow-xl hover:shadow-red-500/25 active:scale-[0.98] transition-all disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed disabled:shadow-none flex items-center justify-center gap-3 uppercase tracking-wider text-sm"
                                             >
                                                 {product.stockQty > 0 ? (
