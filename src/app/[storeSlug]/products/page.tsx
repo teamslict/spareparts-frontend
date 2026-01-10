@@ -34,9 +34,10 @@ export default function ProductsPage() {
         if (!tenant) return;
 
         const fetchProducts = async () => {
+            const currentSlug = tenant.subdomain || 'demo';
             setLoading(true);
             try {
-                const result = await api.getProducts(storeSlug, {
+                const result = await api.getProducts(currentSlug, {
                     category: filters.category,
                     brand: filters.brand,
                     make: filters.make,
@@ -56,7 +57,7 @@ export default function ProductsPage() {
         };
 
         fetchProducts();
-    }, [tenant, storeSlug, filters, page]);
+    }, [tenant, filters, page]);
 
     const handleVehicleSelect = (vehicle: { make?: string; model?: string; year?: string }) => {
         setFilters(prev => ({

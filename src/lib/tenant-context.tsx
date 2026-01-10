@@ -197,7 +197,11 @@ export function TenantProvider({
     children: ReactNode;
     storeSlug?: string;
 }) {
-    const [tenant, setTenant] = useState<TenantConfig>(defaultTenant);
+    const [tenant, setTenant] = useState<TenantConfig>(() => ({
+        ...defaultTenant,
+        subdomain: storeSlug || 'demo',
+        tenantId: storeSlug || 'demo',
+    }));
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
