@@ -98,7 +98,7 @@ export const api = {
             if (params.year) query.append('year', params.year);
 
             const res = await fetchWithRetry(`${API_URL}/api/public/spareparts/products?${query.toString()}`, {
-                next: { revalidate: 60 }
+                cache: 'no-store'
             });
 
             if (!res.ok) throw new Error('Failed to fetch products');
@@ -117,7 +117,7 @@ export const api = {
     getCategories: async (storeSlug: string): Promise<Category[]> => {
         try {
             const res = await fetchWithRetry(`${API_URL}/api/public/spareparts/categories?subdomain=${storeSlug}`, {
-                next: { revalidate: 300 }
+                cache: 'no-store'
             });
             if (!res.ok) return [];
             return await res.json();
@@ -133,7 +133,7 @@ export const api = {
     getBrands: async (storeSlug: string): Promise<Brand[]> => {
         try {
             const res = await fetchWithRetry(`${API_URL}/api/public/spareparts/brands?subdomain=${storeSlug}`, {
-                next: { revalidate: 300 }
+                cache: 'no-store'
             });
             if (!res.ok) return [];
             return await res.json();
@@ -149,7 +149,7 @@ export const api = {
     getProduct: async (storeSlug: string, slug: string): Promise<Product | null> => {
         try {
             const res = await fetchWithRetry(`${API_URL}/api/public/spareparts/products/${slug}?subdomain=${storeSlug}`, {
-                next: { revalidate: 60 }
+                cache: 'no-store'
             });
             if (!res.ok) return null;
             return await res.json();
