@@ -10,8 +10,16 @@ import { useState, useEffect } from 'react';
 
 export function Header() {
     const { tenant } = useTenant();
-    const { getItemCount: getCartCount } = useCart();
-    const { getItemCount: getWishlistCount } = useWishlist();
+    const storeSlug = tenant?.subdomain || 'demo';
+
+    // Use Zustand selector pattern for reactive updates
+    const cartItems = useCart((state) => state.carts[storeSlug] || []);
+    const wishlistItems = useWishlist((state) => state.wishlists[storeSlug] || []);
+
+    // Derive counts - these will update automatically when items change
+    const cartCount = cartItems.reduce((count, item) => count + item.quantity, 0);
+    const wishlistCount = wishlistItems.length;
+
     const [searchQuery, setSearchQuery] = useState('');
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -126,9 +134,9 @@ export function Header() {
                     <Link href={getLink('/account/wishlist')} className="hidden sm:flex items-center gap-2 group p-2 rounded-full hover:bg-gray-50 transition-colors relative">
                         <Heart size={20} className="text-gray-700 group-hover:text-red-600 transition-colors" />
                         <span className="text-xs font-medium text-gray-600 group-hover:text-red-600 hidden xl:block">Saved</span>
-                        {getWishlistCount(tenant?.subdomain || 'demo') > 0 && (
+                        {wishlistCount > 0 && (
                             <span className="absolute top-0 right-0 w-4 h-4 bg-red-600 text-white text-[10px] font-bold flex items-center justify-center rounded-full animate-bounce-short">
-                                {getWishlistCount(tenant?.subdomain || 'demo')}
+                                {wishlistCount}
                             </span>
                         )}
                     </Link>
@@ -142,9 +150,9 @@ export function Header() {
                     {/* Cart */}
                     <Link href={getLink('/cart')} className="relative p-2 rounded-full hover:bg-gray-50 transition-colors group">
                         <ShoppingCart size={22} className="text-gray-700 group-hover:text-red-600 transition-colors" />
-                        {getCartCount(tenant?.subdomain || 'demo') > 0 && (
+                        {cartCount > 0 && (
                             <span className="absolute top-0 right-0 w-4 h-4 bg-red-600 text-white text-[10px] font-bold flex items-center justify-center rounded-full animate-bounce-short">
-                                {getCartCount(tenant?.subdomain || 'demo')}
+                                {cartCount}
                             </span>
                         )}
                     </Link>

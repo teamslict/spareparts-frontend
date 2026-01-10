@@ -2,11 +2,12 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { ShoppingCart, Heart, Eye } from 'lucide-react';
+import { ShoppingCart, Heart, Eye, Check } from 'lucide-react';
 import { useCart } from '@/lib/cart-store';
 import { useTenant } from '@/lib/tenant-context';
 import { useWishlist } from '@/lib/wishlist-store';
 import { PLACEHOLDER_IMAGE } from '@/lib/constants';
+import { useState } from 'react';
 
 // Product image placeholder SVG
 const PRODUCT_PLACEHOLDER = PLACEHOLDER_IMAGE;
@@ -38,6 +39,7 @@ export function ProductCard({
     const { addItem } = useCart();
     const { isInWishlist, toggleWishlist } = useWishlist();
     const { tenant } = useTenant();
+    const [isAdded, setIsAdded] = useState(false);
 
     // Use current tenant's slug for cart namespace and links
     const storeSlug = tenant?.subdomain || 'demo';
@@ -54,6 +56,10 @@ export function ProductCard({
             price: price || 0, // Fallback if null, but allow add
             image: image || PRODUCT_PLACEHOLDER,
         });
+
+        // Trigger animation
+        setIsAdded(true);
+        setTimeout(() => setIsAdded(false), 1500);
     };
 
     const handleWishlistToggle = (e: React.MouseEvent) => {
@@ -192,17 +198,33 @@ export function ProductCard({
                     </div>
                 </div>
 
-                {/* Add to Cart Button (Full width style as per reference) */}
+                {/* Add to Cart Button with Animation */}
                 <div className="mt-2 relative z-20">
                     <button
                         onClick={handleAddToCart}
-                        className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm shadow-lg shadow-blue-900/20 hover:shadow-blue-500/30 active:scale-[0.98] hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2 group/btn cursor-pointer"
+                        disabled={isAdded}
+                        className={`w-full py-3 rounded-xl font-bold text-sm shadow-lg active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2 group/btn cursor-pointer overflow-hidden ${isAdded
+                                ? 'bg-green-500 text-white shadow-green-500/30 scale-[1.02]'
+                                : 'bg-blue-600 hover:bg-blue-500 text-white shadow-blue-900/20 hover:shadow-blue-500/30 hover:-translate-y-0.5'
+                            }`}
                     >
-                        <ShoppingCart size={18} className="transition-transform group-hover/btn:scale-110" />
-                        Add to Cart
+                        <span className={`flex items-center gap-2 transition-all duration-300 ${isAdded ? 'animate-bounce' : ''}`}>
+                            {isAdded ? (
+                                <>
+                                    <Check size={18} className="animate-[ping_0.5s_ease-in-out]" />
+                                    Added!
+                                </>
+                            ) : (
+                                <>
+                                    <ShoppingCart size={18} className="transition-transform group-hover/btn:scale-110" />
+                                    Add to Cart
+                                </>
+                            )}
+                        </span>
                     </button>
                 </div>
             </div>
         </div>
     );
 }
+
