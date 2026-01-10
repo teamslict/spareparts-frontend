@@ -1,36 +1,54 @@
 // src/app/api/erp/[...path]/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 
-export const runtime = 'nodejs'; // Use nodejs runtime for stability
+export const runtime = 'nodejs';
 
 export async function GET(
     request: NextRequest,
     { params }: { params: Promise<{ path: string[] }> }
 ) {
-    // 1. Reconstruct the destination URL
     const { path } = await params;
     const pathString = path.join('/');
     const searchParams = request.nextUrl.searchParams.toString();
-
-    // Use the environment variable or fallback
     const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://erp.slict.lk';
+
     const targetUrl = `${API_BASE}/${pathString}${searchParams ? `?${searchParams}` : ''}`;
 
+    // CHECK: Is this a request that can be cached?
+    // Config rarely changes - cache for 5 minutes to prevent 429 rate limiting
+    const isConfig = pathString.includes('config');
+    const isBrands = pathString.includes('brands');
+    const isCategories = pathString.includes('categories');
+    const isCacheable = isConfig || isBrands || isCategories;
+
+    // Config/Brands/Categories: Revalidate every 300 seconds (5 mins)
+    // Products/Others: No Store (Fresh every time)
+    const fetchOptions: RequestInit = {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        // SMART CACHING: Static data gets cached, dynamic data is always fresh
+        cache: isCacheable ? 'force-cache' : 'no-store',
+        next: isCacheable ? { revalidate: 300 } : undefined,
+    };
+
     try {
-        console.log(`[Proxy] Forwarding GET to: ${targetUrl}`);
+        console.log(`[Proxy GET] ${targetUrl} | Cache: ${isCacheable ? 'CACHED (5m)' : 'NO-STORE'}`);
 
-        // 2. Forward the request to the backend
-        const response = await fetch(targetUrl, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            cache: 'no-store', // CRITICAL: Prevent Next.js server caching
-        });
+        const response = await fetch(targetUrl, fetchOptions);
 
-        // 3. Handle Backend Errors gracefully
         if (!response.ok) {
-            console.error(`[Proxy Error] Backend responded with ${response.status} for ${targetUrl}`);
+            console.error(`[Proxy Error] Status: ${response.status} | URL: ${targetUrl}`);
+
+            // Handle rate limiting gracefully
+            if (response.status === 429) {
+                return NextResponse.json(
+                    { error: 'System busy, please try again in a moment.' },
+                    { status: 429 }
+                );
+            }
+
             return NextResponse.json(
                 { error: `Backend Error: ${response.statusText}` },
                 { status: response.status }
@@ -39,11 +57,15 @@ export async function GET(
 
         const data = await response.json();
 
-        // 4. Return the response to the client
+        // Set appropriate Browser Cache Headers
+        const cacheHeader = isCacheable
+            ? 'public, max-age=300, s-maxage=300, stale-while-revalidate=60'
+            : 'no-store, max-age=0';
+
         return NextResponse.json(data, {
             status: 200,
             headers: {
-                'Cache-Control': 'no-store, max-age=0', // Prevent Browser Caching
+                'Cache-Control': cacheHeader,
             },
         });
 
@@ -56,7 +78,7 @@ export async function GET(
     }
 }
 
-// Handle POST requests
+// Handle POST requests (always fresh, no caching)
 export async function POST(
     request: NextRequest,
     { params }: { params: Promise<{ path: string[] }> }
@@ -67,7 +89,7 @@ export async function POST(
     const targetUrl = `${API_BASE}/${pathString}`;
 
     try {
-        console.log(`[Proxy] Forwarding POST to: ${targetUrl}`);
+        console.log(`[Proxy POST] ${targetUrl}`);
         const body = await request.json();
 
         const response = await fetch(targetUrl, {
@@ -80,16 +102,14 @@ export async function POST(
         });
 
         if (!response.ok) {
-            console.error(`[Proxy Error] Backend responded with ${response.status} for ${targetUrl}`);
+            console.error(`[Proxy Error] POST Status: ${response.status}`);
             const text = await response.text();
             return new NextResponse(text, { status: response.status });
         }
 
         const data = await response.json();
         return NextResponse.json(data, {
-            headers: {
-                'Cache-Control': 'no-store, max-age=0',
-            },
+            headers: { 'Cache-Control': 'no-store, max-age=0' },
         });
     } catch (error) {
         console.error('[Proxy Critical] POST request failed:', error);
@@ -108,14 +128,12 @@ export async function PUT(
     const targetUrl = `${API_BASE}/${pathString}`;
 
     try {
-        console.log(`[Proxy] Forwarding PUT to: ${targetUrl}`);
+        console.log(`[Proxy PUT] ${targetUrl}`);
         const body = await request.json();
 
         const response = await fetch(targetUrl, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body),
             cache: 'no-store',
         });
@@ -127,9 +145,7 @@ export async function PUT(
 
         const data = await response.json();
         return NextResponse.json(data, {
-            headers: {
-                'Cache-Control': 'no-store, max-age=0',
-            },
+            headers: { 'Cache-Control': 'no-store, max-age=0' },
         });
     } catch (error) {
         console.error('[Proxy Critical] PUT request failed:', error);
@@ -149,13 +165,11 @@ export async function DELETE(
     const targetUrl = `${API_BASE}/${pathString}${searchParams ? `?${searchParams}` : ''}`;
 
     try {
-        console.log(`[Proxy] Forwarding DELETE to: ${targetUrl}`);
+        console.log(`[Proxy DELETE] ${targetUrl}`);
 
         const response = await fetch(targetUrl, {
             method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             cache: 'no-store',
         });
 
@@ -166,9 +180,7 @@ export async function DELETE(
 
         const data = await response.json();
         return NextResponse.json(data, {
-            headers: {
-                'Cache-Control': 'no-store, max-age=0',
-            },
+            headers: { 'Cache-Control': 'no-store, max-age=0' },
         });
     } catch (error) {
         console.error('[Proxy Critical] DELETE request failed:', error);
