@@ -1,7 +1,9 @@
-
 import { TenantConfig } from './tenant-context';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://erp.slict.lk';
+// Use Proxy path on client, direct URL on server
+const API_URL = typeof window === 'undefined'
+    ? (process.env.NEXT_PUBLIC_API_URL || 'http://erp.slict.lk')
+    : '/api/erp';
 
 async function fetchWithRetry(url: string, options: RequestInit = {}, retries = 3, backoff = 1000): Promise<Response> {
     try {

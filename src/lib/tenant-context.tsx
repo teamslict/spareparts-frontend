@@ -218,7 +218,10 @@ export function TenantProvider({
 
             console.log('[TenantProvider] Fetching config for slug:', slug);
 
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://erp.slict.lk';
+            // Use Proxy path on client, direct on server (though this runs on client usually)
+            const apiUrl = typeof window === 'undefined'
+                ? (process.env.NEXT_PUBLIC_API_URL || 'http://erp.slict.lk')
+                : '/api/erp';
 
             // Retry logic
             let response: Response | null = null;

@@ -25,6 +25,14 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async rewrites() {
+    return [
+      {
+        source: '/api/erp/:path*',
+        destination: `${process.env.NEXT_PUBLIC_API_URL || 'https://erp.slict.lk'}/:path*`, // Proxy to Backend (removed /api to avoid duplication)
+      },
+    ];
+  },
 };
 
 export default nextConfig;
