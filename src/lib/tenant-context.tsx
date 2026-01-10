@@ -276,25 +276,26 @@ export function TenantProvider({
                     mapUrl: data.config?.mapUrl,
                 });
             } else {
-                // If specific store requested but failed, don't fallback to default - show error
+                // API failed - but ALWAYS preserve the requested subdomain for link building
+                console.warn('[TenantProvider] API failed, using defaults with correct subdomain:', slug);
+                setTenant({
+                    ...defaultTenant,
+                    subdomain: slug, // CRITICAL: Always use the requested slug, never 'demo'
+                    tenantId: slug,
+                });
                 if (storeSlug && storeSlug !== 'demo') {
-                    console.error('[TenantProvider] Failed to load tenant for:', storeSlug);
                     setError('Failed to load store configuration');
-                    // We KEEP the defaultTenant in state but error will be present so we can handle it in UI if we wanted
-                    // For now, let's at least not silently pretend we are Auto Parts Store if we failed to get Slict
-                    // Actually, modifying behavior: if error, maybe we shouldn't show the app content? 
-                    // But to be safe, we will just rely on the Retry Logic fixing 99% of cases.
-                } else {
-                    console.warn('[TenantProvider] API not available, using defaults for demo');
-                    setTenant(defaultTenant);
                 }
             }
         } catch (err) {
             console.error('[TenantProvider] Critical failure:', err);
-            // Only fallback if we are in demo mode
-            if (!storeSlug || storeSlug === 'demo') {
-                setTenant(defaultTenant);
-            }
+            // CRITICAL: Still preserve the subdomain even on complete failure
+            const slug = storeSlug || process.env.NEXT_PUBLIC_DEFAULT_TENANT || 'demo';
+            setTenant({
+                ...defaultTenant,
+                subdomain: slug,
+                tenantId: slug,
+            });
             setError('System error loading configuration');
         } finally {
             setLoading(false);

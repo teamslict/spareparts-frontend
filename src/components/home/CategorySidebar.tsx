@@ -5,7 +5,6 @@ import { ChevronRight, Menu, Grid } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useTenant } from '@/lib/tenant-context';
 import { motion } from 'framer-motion';
-import { useParams } from 'next/navigation';
 
 interface Category {
     name: string;
@@ -33,9 +32,7 @@ const defaultCategories: Category[] = [
 export function CategorySidebar() {
     const [showAll, setShowAll] = useState(false);
     const { tenant } = useTenant();
-    const params = useParams();
-    // CRITICAL: Use URL params directly
-    const storeSlug = (params?.storeSlug as string) || 'demo';
+    const storeSlug = tenant?.subdomain || 'demo';
 
     const [categories, setCategories] = useState<Category[]>([]);
 

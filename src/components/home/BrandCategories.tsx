@@ -6,13 +6,10 @@ import { ArrowRight } from 'lucide-react';
 import { useTenant } from '@/lib/tenant-context';
 import { api, Brand } from '@/lib/api';
 import { resolveImageUrl } from '@/lib/utils';
-import { useParams } from 'next/navigation';
 
 export function BrandCategories() {
     const { tenant } = useTenant();
-    const params = useParams();
-    // CRITICAL: Use URL params directly
-    const storeSlug = (params?.storeSlug as string) || 'demo';
+    const storeSlug = tenant?.subdomain || 'demo';
 
     const [brands, setBrands] = useState<Brand[]>([]);
     const [loading, setLoading] = useState(true);

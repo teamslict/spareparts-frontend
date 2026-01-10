@@ -5,7 +5,6 @@ import { ProductCard, ProductCardProps } from '@/components/product/ProductCard'
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTenant } from '@/lib/tenant-context';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useParams } from 'next/navigation';
 
 const tabs = [
     { id: 'latest', label: 'Latest Parts' },
@@ -19,9 +18,7 @@ const tabs = [
 export function ProductsSection() {
     const [activeTab, setActiveTab] = useState('latest');
     const { tenant } = useTenant();
-    const params = useParams();
-    // CRITICAL: Use URL params directly, NOT tenant.subdomain
-    const storeSlug = (params?.storeSlug as string) || 'demo';
+    const storeSlug = tenant?.subdomain || 'demo';
 
     const [products, setProducts] = useState<ProductCardProps[]>([]);
     const [loading, setLoading] = useState(true);
