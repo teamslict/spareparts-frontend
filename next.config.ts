@@ -25,14 +25,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  async rewrites() {
-    return [
-      {
-        source: '/api/erp/:path*',
-        destination: `${process.env.NEXT_PUBLIC_API_URL || 'https://erp.slict.lk'}/:path*`, // Proxy to Backend (removed /api to avoid duplication)
-      },
-    ];
-  },
+  // Rewrites removed - using dedicated Route Handler at /api/erp/[...path]/route.ts instead
 };
 
 export default nextConfig;

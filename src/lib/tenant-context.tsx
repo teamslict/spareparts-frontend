@@ -283,15 +283,26 @@ export function TenantProvider({
                     mapUrl: data.config?.mapUrl,
                 });
             } else {
-                // API failed - but ALWAYS preserve the requested subdomain for link building
-                console.warn('[TenantProvider] API failed, using defaults with correct subdomain:', slug);
-                setTenant({
-                    ...defaultTenant,
-                    subdomain: slug, // CRITICAL: Always use the requested slug, never 'demo'
-                    tenantId: slug,
-                });
-                if (storeSlug && storeSlug !== 'demo') {
-                    setError('Failed to load store configuration');
+                // LOG THE ERROR VISIBLY
+                console.error(`[TenantProvider] FAILED. Status: ${response?.status}. URL used: ${apiUrl}/api/public/spareparts/config?subdomain=${slug}`);
+
+                // Only fallback silently if it's strictly a 404 (Not Found)
+                if (response?.status === 404) {
+                    console.warn('[TenantProvider] Tenant not found (404), using defaults with correct subdomain.');
+                    setTenant({
+                        ...defaultTenant,
+                        subdomain: slug,
+                        tenantId: slug,
+                    });
+                } else {
+                    // If it's 500 or network error, SHOW IT. Don't hide the problem.
+                    console.error('[TenantProvider] Non-404 error - keeping subdomain but marking error');
+                    setTenant({
+                        ...defaultTenant,
+                        subdomain: slug,
+                        tenantId: slug,
+                    });
+                    setError(`System Error: ${response?.status} - ${response?.statusText || 'Connection Failed'}`);
                 }
             }
         } catch (err) {

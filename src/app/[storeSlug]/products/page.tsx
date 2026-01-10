@@ -8,11 +8,12 @@ import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 import { useTenant } from '@/lib/tenant-context';
 import { api, Product } from '@/lib/api';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, usePathname } from 'next/navigation';
 
 export default function ProductsPage() {
     const { tenant } = useTenant();
     const searchParams = useSearchParams();
+    const pathname = usePathname(); // Forces re-fetch on navigation
     const storeSlug = tenant?.subdomain || 'demo';
 
     const [products, setProducts] = useState<Product[]>([]);
@@ -57,7 +58,7 @@ export default function ProductsPage() {
         };
 
         fetchProducts();
-    }, [tenant, filters, page]);
+    }, [tenant, filters, page, pathname]); // pathname forces re-fetch on navigation
 
     const handleVehicleSelect = (vehicle: { make?: string; model?: string; year?: string }) => {
         setFilters(prev => ({
