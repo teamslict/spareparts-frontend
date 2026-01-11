@@ -50,12 +50,33 @@ export default function CheckoutPage() {
 
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
+    const [loggedInUser, setLoggedInUser] = useState<{ id: string; name: string; phone?: string; address?: string } | null>(null);
     const [formData, setFormData] = useState({
         customerName: '',
         customerPhone: '',
         shippingAddress: '',
         city: '',
     });
+
+    // Pre-fill form data from logged-in user's profile
+    useEffect(() => {
+        const storedUser = localStorage.getItem('spareparts_user');
+        if (storedUser) {
+            try {
+                const user = JSON.parse(storedUser);
+                setLoggedInUser(user);
+                // Pre-fill form with user's data
+                setFormData(prev => ({
+                    customerName: user.name || prev.customerName,
+                    customerPhone: user.phone || prev.customerPhone,
+                    shippingAddress: user.address || prev.shippingAddress,
+                    city: user.city || prev.city,
+                }));
+            } catch (e) {
+                console.error('Error parsing stored user:', e);
+            }
+        }
+    }, []);
 
     // Fetch promotions when cart changes
     const fetchPromotions = useCallback(async (code?: string) => {
@@ -66,8 +87,7 @@ export default function CheckoutPage() {
 
         try {
             setPromoLoading(true);
-            const storedUser = localStorage.getItem('spareparts_user');
-            const customerId = storedUser ? JSON.parse(storedUser).id : undefined;
+            const customerId = loggedInUser?.id;
 
             const result = await api.checkPromotions(storeSlug, {
                 items: items.map(item => ({
@@ -93,7 +113,7 @@ export default function CheckoutPage() {
         } finally {
             setPromoLoading(false);
         }
-    }, [items, storeSlug, appliedPromoCode]);
+    }, [items, storeSlug, appliedPromoCode, loggedInUser?.id]);
 
     // Fetch automatic promotions on mount and cart change
     useEffect(() => {
@@ -128,11 +148,8 @@ export default function CheckoutPage() {
         setIsLoading(true);
 
         try {
-            const storedUser = localStorage.getItem('spareparts_user');
-            const customerId = storedUser ? JSON.parse(storedUser).id : undefined;
-
             const orderData = {
-                customerId,
+                customerId: loggedInUser?.id,
                 customerName: formData.customerName,
                 customerPhone: formData.customerPhone,
                 shippingAddress: `${formData.shippingAddress}, ${formData.city}`,
